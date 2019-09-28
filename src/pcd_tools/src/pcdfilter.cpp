@@ -8,6 +8,14 @@
 #include <pcl/filters/impl/plane_clipper3D.hpp>
 #include <pcl/filters/extract_indices.h>
 
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/approximate_voxel_grid.h>
+#include <pcl/filters/radius_outlier_removal.h>
+#include <pcl/filters/statistical_outlier_removal.h>
+
 class PcdFilter
 {
 public:
@@ -63,10 +71,29 @@ public:
 	void filter()
 	{
 		mfilteredCloudPtr.reset(new pcl::PointCloud<PointT>);
-		float sensor_height = 1.8;
-		mfilteredCloudPtr = planeClip(mRawPointcloudPtr, Eigen::Vector4f(0.0f, 0.0f, 1.0f, mClipRangeUp), false);
-		mfilteredCloudPtr = planeClip(mRawPointcloudPtr, Eigen::Vector4f(0.0f, 0.0f, 1.0f, mClipRangeDown), true);
+		*mfilteredCloudPtr = *mRawPointcloudPtr;
+		planFilter();
+		downsample(0.3);
+		
 	}
+	
+	void planFilter()
+	{
+		mfilteredCloudPtr = planeClip(mRawPointcloudPtr, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -mClipRangeDown), false);
+		mfilteredCloudPtr = planeClip(mfilteredCloudPtr, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -mClipRangeUp), true);
+	}
+	
+	void downsample(float downsample_resolution)
+	{
+		pcl::Filter<PointT>::Ptr downsample_filter;
+		boost::shared_ptr<pcl::VoxelGrid<PointT>> voxelgrid(new pcl::VoxelGrid<PointT>());
+		voxelgrid->setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
+		downsample_filter = voxelgrid;
+		
+		downsample_filter->setInputCloud(mfilteredCloudPtr);
+		downsample_filter->filter(*mfilteredCloudPtr);
+	}
+	
 	
 	void showPointcloud()
 	{

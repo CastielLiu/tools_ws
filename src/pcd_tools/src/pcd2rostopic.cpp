@@ -34,7 +34,7 @@ pcl::PointCloud<PointT>::Ptr plane_clip(const pcl::PointCloud<PointT>::Ptr& src_
 int main(int argc, char** argv) {
     // *****Initialize ROS
     ros::init (argc, argv, "pcd2ros");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh, nh_private("~");
     
     if(argc <2)
     {
@@ -53,8 +53,11 @@ int main(int argc, char** argv) {
     
     pcl::PointCloud<PointT>::Ptr filtered(new pcl::PointCloud<PointT>);
     float sensor_height = 1.8;
-    filtered = plane_clip(cloud_raw, Eigen::Vector4f(0.0f, 0.0f, 1.0f, sensor_height + 0.0), false);
-    filtered = plane_clip(cloud_raw, Eigen::Vector4f(0.0f, 0.0f, 1.0f, sensor_height - 1), true);
+    float clip_range_up = nh_private.param<float>("clip_range_up",1.0);
+    float clip_range_down= nh_private.param<float>("clip_range_down",-1.0);
+    
+    filtered = plane_clip(cloud_raw, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -clip_range_up), false);
+    filtered = plane_clip(filtered, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -clip_range_down), true);
     
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
     
