@@ -6,7 +6,7 @@
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
-  <maintainer email="wendao@todo.todo">wendao</maintainer>
+  <maintainer email="castiel_liu@outlook.com">wendao</maintainer>
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
@@ -31,3 +31,4 @@
 
   </export>
 </package>
+
