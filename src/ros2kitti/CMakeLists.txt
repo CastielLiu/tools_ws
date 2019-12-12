@@ -8,10 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  pcl_ros
-  sensor_msgs
-  std_msgs
+	pcl_ros
+	sensor_msgs
+	cv_bridge
+	image_transport
+	std_msgs
 )
+find_package(OpenCV REQUIRED)
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -28,7 +31,7 @@ include_directories(
 
 ## Declare a C++ library
 
-add_executable(ros2kitti_node src/ros2kitti.cpp)
+add_executable(ros2kitti_node src/ros2kitti_2.cpp)
 add_dependencies(ros2kitti_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ros2kitti_node ${catkin_LIBRARIES})
+target_link_libraries(ros2kitti_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 

@@ -1,7 +1,8 @@
 <!-- -->
 <launch>
 	<node pkg="ros2kitti" type="ros2kitti_node" name="ros2kitti_node" output="screen">
-		<param name="pointclouds_topic" value="/pandar_points"/>
+		<param name="pointclouds_topic" value="/velodyne_points"/>
+		<param name="image_topic" value="/usb_cam/image_raw" />
 		<param name="file_path" value="$(find ros2kitti)/data"/>
 	</node>
 	
