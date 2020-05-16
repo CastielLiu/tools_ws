@@ -2,7 +2,9 @@ import sys
 import cv2
 import imageio
 
-def handle(video,start_time,end_time, resolution=1):
+def handle(video,start_time,end_time, resolution):
+	if resolution is None:
+		resolution = 1
 	cap = cv2.VideoCapture(video)
 	frame_rate = cap.get(cv2.CAP_PROP_FPS)
 	frame_cnt = cap.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -21,7 +23,11 @@ def handle(video,start_time,end_time, resolution=1):
 #	print("form", form)
 	
 	fourcc = cv2.VideoWriter_fourcc(*'MP42')
-	out = cv2.VideoWriter('1.avi', fourcc, frame_rate, size)
+
+	prefix = video.split('.')
+	outName = prefix[0]+'_out.'+prefix[1]
+	print(outName)
+	out = cv2.VideoWriter(outName, fourcc, frame_rate, size)
 	while True:
 		time = cap.get(cv2.CAP_PROP_POS_MSEC)
 		if(time >= end_time*1000):
@@ -44,10 +50,17 @@ def handle(video,start_time,end_time, resolution=1):
 	print("process ok...")
 
 def main(argv):
-	if(len(argv)!=4):
+	if(len(argv) < 4):
 		print("please input video, start time, end time")
 		exit()
-	handle(argv[1],float(argv[2]),float(argv[3]),5)
+	_inVideo = argv[1]
+	startTime = float(argv[2])
+	endTime = float(argv[3])
+	if(len(argv) > 4):
+		resolution = float(argv[4])
+	else:
+		resolution = None
+	handle(_inVideo,startTime, endTime,resolution)
 	
 if __name__ == "__main__":
 	main(sys.argv)

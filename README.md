@@ -7,5 +7,14 @@
 	batch modify the author and email in package.xml
 4. [ros2kitti]
 	save the ros messages in kitti format. PointCloud2/Image
-5. [imageTool]
+5. [image_tools]
 	Image and video processing 
+6. [virtual_com]
+   虚拟串口工具
+7. [pcd_tool]
+   pcd点云处理相关
+8. [camera_tools]
+   摄像头相关
+9. [socket]
+   网络通信
+
