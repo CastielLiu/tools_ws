@@ -12,6 +12,17 @@
 * **`run`**
     python video2gif.py srcVideo resolution [totalTime]
 
+### images2gif.py
+    将一系列图片转换为gif动图
+* **`argvs`**
+    1. path 图片路径(绝对路径/相对路径)
+    2. startSeq 图片起始序号
+    3. endSeq 图片终止序号
+    4. suffix 图片后缀、拓展名(png,jpg...)
+    5. duration 生成gif图的总时长
+    
+* **`run`**
+    python images2gif.py path,startSeq,endSeq,suffix,duration
 
 ### video_cutter.py
     视频裁剪
