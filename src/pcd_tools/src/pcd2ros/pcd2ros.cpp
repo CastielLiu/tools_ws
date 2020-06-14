@@ -36,9 +36,9 @@ int main(int argc, char** argv) {
     ros::init (argc, argv, "pcd2ros");
     ros::NodeHandle nh, nh_private("~");
     
-    if(argc <2)
+    if(argc < 3)
     {
-    	ROS_ERROR("please input pcd file path...");
+    	ROS_ERROR("please input [pcd file] [publish hz]");
     	return 0;
     }
  
@@ -49,43 +49,35 @@ int main(int argc, char** argv) {
         PCL_ERROR ("Couldn't read file %s ^.^\n",argv[1]);
         return (-1);
     }
-    std::cerr << "size of a : " << cloud_raw->width*cloud_raw->height<< std::endl;
-    
-    pcl::PointCloud<PointT>::Ptr filtered(new pcl::PointCloud<PointT>);
-    float sensor_height = 1.8;
-    float clip_range_up = nh_private.param<float>("clip_range_up",1.0);
-    float clip_range_down= nh_private.param<float>("clip_range_down",-1.0);
-    
-    filtered = plane_clip(cloud_raw, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -clip_range_up), false);
-    filtered = plane_clip(filtered, Eigen::Vector4f(0.0f, 0.0f, 1.0f, -clip_range_down), true);
-    
+    std::cerr << "size of pcd : " << cloud_raw->width*cloud_raw->height<< std::endl;
+
+    /*
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
     
 	viewer->setBackgroundColor (0, 0, 0); 
 	viewer->addPointCloud<PointT> (filtered, "sample cloud");
 	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
     viewer->addCoordinateSystem (1.0);
-    
+    */
+
     //*****Convert the pcl/PointCloud data to sensor_msgs/PointCloud2
     sensor_msgs::PointCloud2 clouda_ros;
-    
-    pcl::toROSMsg (*filtered, clouda_ros);
+    pcl::toROSMsg (*cloud_raw, clouda_ros);
     
     std::string topic_name = "/point_cloud";
-    std::string frame_id = "base_link";
+    std::string frame_id = "lidar";
     
    	std::cout << "topic: " << topic_name << std::endl;
    	std::cout << "frame_id: " << frame_id << std::endl;
     
     puba = nh.advertise<sensor_msgs::PointCloud2> (topic_name, 1);
  
-    ros::Rate r(3);
+    ros::Rate r(atoi(argv[2]));
     while(ros::ok())
     {
 		clouda_ros.header.stamp = ros::Time::now();
 		clouda_ros.header.frame_id = frame_id;
 		puba.publish(clouda_ros);
-		viewer->spinOnce (100);
 		r.sleep();
     }
     return 0;

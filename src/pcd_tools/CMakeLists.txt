@@ -28,10 +28,20 @@ include_directories(
 
 ## Declare a C++ library
 
-add_executable(pcd2rostopic_node src/pcd2rostopic.cpp)
-add_dependencies(pcd2rostopic_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(pcd2rostopic_node ${catkin_LIBRARIES})
+add_executable(pcd2ros_node src/pcd2ros/pcd2ros.cpp)
+add_dependencies(pcd2ros_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pcd2ros_node ${catkin_LIBRARIES})
+
+add_executable(ros2pcd_node src/ros2pcd/ros2pcd.cpp)
+add_dependencies(ros2pcd_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ros2pcd_node ${catkin_LIBRARIES})
+
 
 add_executable(pcdfilter_node src/pcdfilter.cpp)
 add_dependencies(pcdfilter_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(pcdfilter_node ${catkin_LIBRARIES})
+
+add_executable(register_demo_node src/register_demo/register_demo.cpp)
+add_dependencies(register_demo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(register_demo_node ${catkin_LIBRARIES})
+

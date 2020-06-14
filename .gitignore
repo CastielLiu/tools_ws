@@ -1,3 +1,9 @@
 build/
 devel/
 .catkin_workspace
+.vscode
+.ycm_extra_conf.py*
+el*
+devel_isolated/
+*.pcd
+
