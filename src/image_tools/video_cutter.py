@@ -22,7 +22,8 @@ def handle(video,start_time,end_time, resolution):
 #	form = cap.get(cv2.CAP_PROP_POS_FRAMES)
 #	print("form", form)
 	
-	fourcc = cv2.VideoWriter_fourcc(*'MP42')
+	#fourcc = cv2.VideoWriter_fourcc(*'MP42')
+	fourcc = cv2.VideoWriter_fourcc(*'XVID')
 
 	prefix = video.split('.')
 	outName = prefix[0]+'_out.'+prefix[1]
