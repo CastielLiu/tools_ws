@@ -20,9 +20,11 @@
     3. endSeq 图片终止序号
     4. suffix 图片后缀、拓展名(png,jpg...)
     5. duration 生成gif图的总时长
+    6. resolution 取图精度，隔resolution张取一张　(默认为1)
+    7. scale   缩放比例(默认为1)
     
 * **`run`**
-    python images2gif.py path,startSeq,endSeq,suffix,duration
+    python images2gif.py path,startSeq,endSeq,suffix,duration,(resolution,scale)
 
 ### video_cutter.py
     视频裁剪
@@ -44,3 +46,14 @@
 
 * **`run`**
     python video_cutter.py srcVideo 
+
+### video2images.py
+    将视频拆分为图片，保存于在当前目录自动创建图像文件夹
+* **`argvs`**
+    1. srcVideo   视频路径
+
+* **`run`**
+    python video_cutter.py srcVideo 
+
+### video_post.py 
+    视频合成，将一张图片合成到另一张图片上
