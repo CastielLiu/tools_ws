@@ -4,6 +4,9 @@ import sys
 import cv2
 import imageio
 import os
+sys.path.append("lib/")
+from image_mask import imageAdd
+from image_mask import imageStdAdd
 
 def handle(video,start_time,end_time, resolution):
 	if resolution is None:
@@ -53,32 +56,6 @@ def handle(video,start_time,end_time, resolution):
 	out.release()
 	print("process ok...")
 
-#图片叠加函数，在image1上添加image2
-#image1的尺寸必须大于image2
-#参数loc为添加位置,默认为0,右上角
-def imageAdd(image1, image2, loc=0):
-	w1 = image1.shape[1]
-	h1 = image1.shape[0]
-	
-	w2 = image2.shape[1]
-	h2 = image2.shape[0]
-	
-	if(w2 > w1 or h2 > h1):
-		print("The image2 is bigger than image1!")
-		return None
-	
-	if(loc == 0):
-		rowBegin = 0
-		colBegin = w1-w2
-	elif(loc == 1):
-		rowBegin = 0
-		colBegin = 0
-	
-	for row in range(image2.shape[0]):
-		for col in range(image2.shape[1]):
-			#for channel in range(image2.shape[2]):
-			image1[row+rowBegin, col+colBegin] = image2[row, col]
-	return image1
 
 def fun():
 	image1_buf = []
@@ -100,14 +77,22 @@ def fun():
 	i = 0
 	cv2.namedWindow("IMG",0)
 	image1_buf_len = len(image1_buf)
+	mask = None
 	while(key != ord('q')):
 		
 		j = int(len(image2_buf)*i*1.0/len(image1_buf))
 		image1 = image1_buf[i]
 		image2 = image2_buf[j]
+		
+		if(mask is None):
+			mask = cv2.imread("mask.jpg")
+			
+		image1 = imageAdd(image1, mask, (39,969))
+		image2 = imageAdd(image2, mask, (39,969))
+		
 		scale = 0.4
 		image2 =cv2.resize(image2,(0,0),fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-		image3 = imageAdd(image1,image2, 1)
+		image3 = imageStdAdd(image1,image2, 1)
 
 		cv2.imshow("IMG",image3)
 		
@@ -119,7 +104,7 @@ def fun():
 				i = i +1
 			i = (i+image1_buf_len)%image1_buf_len
 		else:
-			key = cv2.waitKey(30)
+			key = cv2.waitKey(1)
 			cv2.imwrite("result/"+str(i)+".jpg", image3, [int( cv2.IMWRITE_JPEG_QUALITY), 100])
 			i = i + 1
 			if(i >= image1_buf_len):

@@ -3,7 +3,7 @@
 ##tools
 
 ### video2gif.py
-    将视频转换为gif动图
+    将视频转换为gif动图,可在图片上添加mask,　将mask.jpg与图片放在同级目录
 * **`argvs`**
     1. srcVideo 视频路径
     2. resolution gif精度，每reslotion个视频帧取一帧存入gif
