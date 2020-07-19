@@ -75,6 +75,8 @@ def main(argv):
 		print("please input images [path],[startSeq],[endSeq],[suffix],[duration] (resolution, scale)")
 		exit()
 	path = argv[1]
+	if(path[-1] == "/"):
+		path = path[0:-1]
 	startSeq = int(argv[2])
 	endSeq = int(argv[3])
 	suffix = argv[4]

@@ -21,7 +21,7 @@ class AddMask:
 		self.out_dir = None
 		self.inited = False
 		self.img_index = 0
-		self.save_current = False
+		#self.save_current = False
 		print("click left button to select mask location.\npress 's' to save new images.\npress 'q' to cancel.")
 
 	def onMouse1(self,event,x,y,flags,param):
@@ -31,8 +31,8 @@ class AddMask:
 	def onMouse2(self,event,x,y,flags,param):
 		if(event == cv2.EVENT_LBUTTONDOWN):
 			self.mask_loc = (x,y)
-		elif(event == cv2.EVENT_MBUTTONDOWN):
-			self.save_current = True
+		#elif(event == cv2.EVENT_MBUTTONDOWN):
+		#	self.save_current = True
 
 	def init(self,path,suffix,mask_image):
 		self.image_path = path
@@ -91,10 +91,6 @@ class AddMask:
 				cv2.destroyAllWindows()
 				return
 		
-		new_dir = self.image_path + "_masked"
-		if(not os.path.exists(new_dir)):
-			os.mkdir(new_dir, 0777)
-		
 		cnt = 1
 		for img_name in self.img_names:
 			img = cv2.imread(img_name)
@@ -105,7 +101,7 @@ class AddMask:
 			temp = img_name.split('/')
 			imgRelName = temp[len(temp)-1]
 			
-			out_name = new_dir + "/" + imgRelName
+			out_name = self.out_dir + "/" + imgRelName
 			print("%d: %s saved." %(cnt,out_name))
 			cnt = cnt + 1
 			cv2.imwrite(out_name,img)
@@ -140,8 +136,7 @@ class AddMask:
 			if(ord('q') == key):
 				cv2.destroyAllWindows()
 				return
-			if(self.save_current):
-				self.save_current = False
+			if(ord('s') == key):
 				raw_img = None
 				self.img_index = self.img_index + 1
 				temp = img_name.split('/')
@@ -157,6 +152,7 @@ class AddMask:
 def main(argv):
 	if(len(argv) < 5):
 		print("please input images [path],[suffix],[mask_image],[mode]")
+		print("mode 0:addMaskInSameLocation  1:addMaskInDiffLocation")
 		exit()
 	path = argv[1]
 	suffix = argv[2]
