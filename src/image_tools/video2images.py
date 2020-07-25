@@ -1,3 +1,4 @@
+#coding:utf-8
 import sys
 import cv2
 import imageio
@@ -13,7 +14,7 @@ def handle(video):
 	prefix,_ = video.split('.')
 	images_dir = prefix + "_images"
 	if(not os.path.exists(images_dir)):
-		os.mkdir(images_dir, 0777)
+		os.mkdir(images_dir)
 		
 	while True:
 		result, img = cap.read()
@@ -26,6 +27,8 @@ def handle(video):
 		#cv2.imwrite(img_name, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 		cv2.imwrite(img_name, img, [int( cv2.IMWRITE_JPEG_QUALITY), 100])
 		print("%s saved." %img_name)
+		sys.stdout.flush() #强制刷新输出缓冲区
+	print("video2images ok\nimages saved in %s" %images_dir)
 
 def main(argv):
 	if(len(argv) < 2):

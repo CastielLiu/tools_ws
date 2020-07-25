@@ -10,7 +10,7 @@ const QString g_toolDescription_videoCutter =
         QString("视频裁剪\n等待开发");
 
 const QString g_toolDescription_video2images =
-        QString("视频转图片\n等待开发");
+        QString("视频转图片\n");
 
 
 enum taskType
@@ -46,7 +46,23 @@ public:
         std::string _cmd = std::string("python ")+tool_script+" "+video_name+" "+image_interval+" "+total_time;
         return _cmd;
     }
+};
 
+class Video2images
+{
+public:
+    Video2images(const std::string& scriptsDir)
+    {
+        tool_script = scriptsDir + "/video2images.py";
+    }
+    std::string tool_script;
+    std::string video_name;
+
+    std::string cmd()
+    {
+        std::string _cmd = std::string("python ")+tool_script+" "+video_name;
+        return _cmd;
+    }
 };
 
 

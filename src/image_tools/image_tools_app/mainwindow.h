@@ -9,6 +9,9 @@
 #include <cstdio>
 #include <QDebug>
 #include <QStringListModel>
+#include <QMessageBox>
+#include <QThread>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,20 +32,26 @@ private slots:
 
     void on_pushButton_video2gif_start_clicked();
 
-    void on_pushButton_test_clicked();
-
-    void on_pushButton_stop_clicked();
-
     void on_tabWidget_currentChanged(int index);
+
+    void on_pushButton_forceQuit_clicked();
+    void on_pushButton_video2images_select_clicked();
+
+    void on_pushButton_video2images_start_clicked();
+
+private:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
     QString m_appDir;
     QString m_toolScriptsDir;
     bool m_isProcessing;
-    bool m_forceExit;
+    bool m_forceQuitCurrentTool;
 
     Video2gif* m_video2gif;
+    Video2images *m_video2images;
+    int m_lastTabIndex;
 
     QStringListModel m_logModel;
 };
