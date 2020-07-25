@@ -123,6 +123,8 @@ class ImagesCutter:
 			if(ord('q') == key):
 				cv2.destroyAllWindows()
 				return
+			elif(ord('s') == key):
+				self.select_ok = True
 		cnt = 1
 		rowBegin = min(self.cut_vertex1[1], self.cut_vertex2[1])
 		rowEnd   = max(self.cut_vertex1[1], self.cut_vertex2[1])
@@ -161,6 +163,8 @@ def main(argv):
 		h = int(temp[1])
 		if(w > 0 and h >0):
 			ratio = (w,h)             #裁剪宽高比
+		else
+			print("The parameter (w:h) is invalid! ")
 	if(len(argv) > 4):
 		asTargetScale = bool(argv[4]) #使用传入的宽高比数值作为目标尺寸
 
