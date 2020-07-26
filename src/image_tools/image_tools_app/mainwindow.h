@@ -50,6 +50,10 @@ private slots:
 
     void on_pushButton_imagesCutter_start_clicked();
 
+    void on_pushButton_videoCutter_select_clicked();
+
+    void on_pushButton_videoCutter_start_clicked();
+
 signals:
     void addDataToLogListView(const QString& data);
 
@@ -63,10 +67,11 @@ private:
     bool m_isProcessing;
     bool m_forceQuitCurrentTool;
 
-    Video2gif* m_video2gif;
+    Video2gif    *m_video2gif;
     Video2images *m_video2images;
-    Images2gif *m_images2gif;
+    Images2gif   *m_images2gif;
     ImagesCutter *m_imagesCutter;
+    VideoCutter  *m_videoCutter;
 
     int m_lastTabIndex;
 

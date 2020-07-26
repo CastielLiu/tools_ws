@@ -11,6 +11,7 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     m_video2images = new Video2images(m_toolScriptsDir.toStdString());
     m_images2gif = new Images2gif(m_toolScriptsDir.toStdString());
     m_imagesCutter = new ImagesCutter(m_toolScriptsDir.toStdString());
+    m_videoCutter = new VideoCutter(m_toolScriptsDir.toStdString());
     m_isProcessing = false;
 
     ui->setupUi(this);
@@ -33,6 +34,7 @@ MainWindow::~MainWindow()
     delete m_video2images;
     delete m_images2gif;
     delete m_imagesCutter;
+    delete m_videoCutter;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -113,6 +115,8 @@ void MainWindow::processThread(taskType task)
         cmd = m_images2gif->cmd();
     else if(taskType_imagesCutter == task)
         cmd = m_imagesCutter->cmd();
+    else if(taskType_videoCutter == task)
+        cmd = m_videoCutter->cmd();
 
     emit addDataToLogListView(QString::fromStdString(cmd));
     FILE* fp = popen(cmd.c_str(),"r");
@@ -283,5 +287,27 @@ void MainWindow::on_pushButton_imagesCutter_start_clicked()
     m_imagesCutter->expect_h = ui->lineEdit_imagesCutter_h->text().toStdString();
     m_imagesCutter->use_w_h_as_target_size = ui->checkBox_imagesCutter_asTargetSize->isChecked();
     std::thread t(&MainWindow::processThread,this,taskType_imagesCutter);
+    t.detach();
+}
+
+
+void MainWindow::on_pushButton_videoCutter_select_clicked()
+{
+    QString video = QFileDialog::getOpenFileName(this,tr("选择视频"),"/home");
+    if(video.isEmpty())
+        return;
+    ui->lineEdit_videoCutter_video ->setText(video);
+}
+
+void MainWindow::on_pushButton_videoCutter_start_clicked()
+{
+    if(m_isProcessing)
+    {
+        onAddDataToLogListView("system is processing now, please try again a later.");
+        return;
+    }
+    m_videoCutter->video_name = ui->lineEdit_videoCutter_video->text().toStdString();
+
+    std::thread t(&MainWindow::processThread,this,taskType_videoCutter);
     t.detach();
 }

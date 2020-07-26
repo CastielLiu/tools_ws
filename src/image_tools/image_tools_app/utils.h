@@ -125,7 +125,7 @@ class VideoCutter
 public:
     VideoCutter(const std::string& scriptsDir)
     {
-        tool_script = scriptsDir + "/video2images.py";
+        tool_script = scriptsDir + "/video_cutter2.py";
     }
     std::string tool_script;
     std::string video_name;
