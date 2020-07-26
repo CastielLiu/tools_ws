@@ -5,10 +5,6 @@ import cv2
 import imageio
 import os
 
-sys.path.append(sys.path[0]+"/lib/") #以绝对路径的形式添加模块路径
-from image_mask import imageAdd
-from image_mask import imageStdAdd
-
 class ImagesCutter:
 	def __init__(self):
 		self.cut_vertex1 = None

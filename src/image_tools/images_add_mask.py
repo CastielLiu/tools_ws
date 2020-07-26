@@ -5,9 +5,10 @@ import cv2
 import imageio
 import os
 
-sys.path.append("lib/")
-from image_mask import imageAdd
-from image_mask import imageStdAdd
+sys.path.append(sys.path[0]+"/lib/")
+from image_add import imageAdd
+from image_add import imageStdAdd
+from image_add import imageAddWeighted
 
 class AddMask:
 	def __init__(self):
@@ -21,25 +22,32 @@ class AddMask:
 		self.out_dir = None
 		self.inited = False
 		self.img_index = 0
+		self.alpha = 0.0 #透明度
+		self.selecting = False
 		#self.save_current = False
-		print("click left button to select mask location.\npress 's' to save new images.\npress 'q' to cancel.")
 
 	def onMouse1(self,event,x,y,flags,param):
 		if(event == cv2.EVENT_LBUTTONDOWN):
 			self.mask_loc = (x,y)
+			self.selecting = True
+		elif(event == cv2.EVENT_LBUTTONUP):
+			self.selecting = False
+		elif(event == cv2.EVENT_MOUSEMOVE):
+			if(self.selecting):
+				self.mask_loc = (x,y)
 			
 	def onMouse2(self,event,x,y,flags,param):
-		if(event == cv2.EVENT_LBUTTONDOWN):
-			self.mask_loc = (x,y)
-		#elif(event == cv2.EVENT_MBUTTONDOWN):
-		#	self.save_current = True
+		self.onMouse1(event,x,y,flags,param)
+		
+	def onAlphaSliderChanged(self,pos):
+		self.alpha = pos / 100.0
 
 	def init(self,path,suffix,mask_image):
 		self.image_path = path
 		
 		self.mask = cv2.imread(mask_image)
 		if(self.mask is None):
-			print("mask_image is invalid!")
+			print("mask_image %s is invalid!" %mask_image)
 			return False
 
 		#按照seq获取所有可用文件名
@@ -60,8 +68,12 @@ class AddMask:
 		#创建输出文件夹
 		self.out_dir = self.image_path + "_masked"
 		if(not os.path.exists(self.out_dir)):
-			os.mkdir(self.out_dir, 0777)
-			
+			os.mkdir(self.out_dir)
+		
+		cv2.namedWindow(self.windowName,0)
+		#创建滑动
+		cv2.createTrackbar('Alpha(%)',self.windowName,0,100,self.onAlphaSliderChanged)
+		
 		self.inited = True
 		return True
 		
@@ -69,15 +81,14 @@ class AddMask:
 		if(self.inited == False):
 			print("please initial before addMaskInSameLocation")
 			return
-			
-		cv2.namedWindow(self.windowName,0)
+		
 		cv2.setMouseCallback(self.windowName, self.onMouse1)
 		
 		raw_img = cv2.imread(self.img_names[0])
 		while(True):
 			out_img = raw_img.copy() #拷贝一份，防止污染源图
 			if(self.mask_loc): #mask位置有效
-				out_img = imageAdd(out_img,self.mask, self.mask_loc)
+				out_img = imageAddWeighted(out_img,self.mask, self.mask_loc, (self.alpha,1-self.alpha))
 				if(out_img is None): #添加不成功
 					self.mask_loc = None #mask位置置为无效
 					continue
@@ -96,22 +107,25 @@ class AddMask:
 			img = cv2.imread(img_name)
 			if(img is None):
 				break
-			img = imageAdd(img,self.mask, self.mask_loc)
+			img = imageAddWeighted(img,self.mask, self.mask_loc, (self.alpha,1-self.alpha))
 			
 			temp = img_name.split('/')
 			imgRelName = temp[len(temp)-1]
-			
 			out_name = self.out_dir + "/" + imgRelName
-			print("%d: %s saved." %(cnt,out_name))
-			cnt = cnt + 1
+			
 			cv2.imwrite(out_name,img)
+			print("%d: %s saved." %(cnt,out_name))
+			sys.stdout.flush()
+			cnt = cnt + 1
+		
+		print("masked images saved in %s." %(self.out_dir))
+		sys.stdout.flush()
 			
 	def addMaskInDiffLocation(self):
 		if(self.inited == False):
 			print("please initial before addMaskInDiffLocation")
 			return
 			
-		cv2.namedWindow(self.windowName,0)
 		cv2.setMouseCallback(self.windowName, self.onMouse2)
 		
 		raw_img = None
@@ -125,7 +139,7 @@ class AddMask:
 
 			out_img = raw_img.copy()#拷贝一份，防止污染源图
 			if(self.mask_loc ): #mask位置有效
-				out_img = imageAdd(out_img,self.mask, self.mask_loc)
+				out_img = imageAddWeighted(out_img,self.mask, self.mask_loc, (self.alpha,1-self.alpha))
 				if(out_img is None):# 添加不成功
 					self.mask_loc = None #mask位置置为无效
 					continue;
@@ -142,10 +156,12 @@ class AddMask:
 				temp = img_name.split('/')
 				imgRelName = temp[-1]
 				out_name = self.out_dir + "/" + imgRelName
-				print("%s saved." %out_name)
-				if(out_img is None):
-					print("")
+				
 				cv2.imwrite(out_name,out_img);
+				print("%s saved." %out_name)
+				sys.stdout.flush()
+		print("masked images saved in %s." %(self.out_dir))
+		sys.stdout.flush()
 
 #mode 0: 所有图片在同一位置添加mask, 点击鼠标左键选择mask位置,位置确定后点击's'开始保存
 #mode 1: 每张图片上的mask位置均可指定, 点击鼠标左键选择mask位置,点击鼠标滚轮保存当前图片并切换到下一张
@@ -158,7 +174,8 @@ def main(argv):
 	suffix = argv[2]
 	mask_image = argv[3]
 	mode = int(argv[4])
-	
+	print("click left button to select mask location.\npress 's' to save new images.\npress 'q' to cancel.")
+	sys.stdout.flush()
 	app = AddMask()
 	ok = app.init(path,suffix,mask_image)
 	if(not ok):

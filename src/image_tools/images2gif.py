@@ -5,8 +5,6 @@ import cv2
 import imageio
 import datetime
 import os
-sys.path.append(sys.path[0]+"/lib/") #以绝对路径的形式添加模块路径
-from image_mask import imageAddWeighted
 
 def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
 	
@@ -25,14 +23,6 @@ def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
 	
 	imageBuf = []
 	
-	#添加指定位置加权添加mask,　如需此功能，需在图像同级目录放置mask.jpg
-	mask = None
-	mask_file = path+"/mask.jpg"
-	if(os.path.exists(mask_file)):
-		mask = cv2.imread(mask_file)
-	mask_loc = (580,10)   #mask位置
-	mask_ratio = (0,1)    #原图与mask各占比例
-	
 	#利用需要的图像数量插值查找图像并添加进imageBuf
 	for i in range(needFrameCnt+1):
 		j = int(i*1.0/needFrameCnt*totalFrameCnt)
@@ -44,8 +34,6 @@ def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
 		if(img is None):
 			print("read %s failed" %imageNames[j])
 			continue
-		if(mask is not None):
-			imageAddWeighted(img, mask, mask_loc, mask_ratio)
 		
 		print("append image: %s" %imageNames[j])
 		sys.stdout.flush() #强制刷新输出缓冲区

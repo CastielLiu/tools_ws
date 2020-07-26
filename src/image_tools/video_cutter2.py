@@ -1,6 +1,10 @@
 #coding:utf-8
+
 import sys
 import cv2
+
+sys.path.append(sys.path[0]+"/lib")
+from image_area_selecter import ImageAreaSelecter
 
 PAUSE = 0
 STOP = 1
@@ -15,6 +19,7 @@ class VideoCutter:
 		self.video_rate = None
 		self.video_size = None
 		self.video_name = None
+		self.video_fourcc = None
 		self.setVideoPose = None
 		self.currentVideoPose = 0
 		self.videoStatus = RUNNING
@@ -26,15 +31,15 @@ class VideoCutter:
 		#自动更新时回调函数只需将此值复位，无需其他操作，方式耗时
 		self.posSliderAutoChange = False
 		
+		self.imageAreaSelecter = None
+		
 	def __delete__(self):
-		if(self.cap):
+		cv2.destroyAllWindows()
+		if(self.cap is not None):
 			self.cap.release()
 	
 	def exitProcess(self):
-		cv2.destroyAllWindows()
-		if(self.cap):
-			self.cap.release()
-			self.cap = None
+		self.__delete__()
 		exit(0)
 	
 	def onVideoPosSliderChanged(self,pos):
@@ -69,17 +74,26 @@ class VideoCutter:
 	def cut_video(self, output_name):
 		print("start cut video, please wait...")
 		sys.stdout.flush()
-		#fourcc = cv2.VideoWriter_fourcc(*'WMV1')
-		fourcc = cv2.VideoWriter_fourcc(*'XVID')
-		outVideo = cv2.VideoWriter(output_name, fourcc, self.video_rate, self.video_size)
 		
+		#获取鼠标框选区域,并根据框选区域设置输出视频尺寸
+		cutArea = self.imageAreaSelecter.getAreaVertex()
+		if(cutArea is not None):
+			rowBegin,colBegin,rowEnd,colEnd = cutArea
+			self.video_size = (colEnd-colBegin, rowEnd-rowBegin)
+
+		outVideo = cv2.VideoWriter(output_name, int(self.video_fourcc), self.video_rate, self.video_size)
 		self.cap.set(cv2.CAP_PROP_POS_FRAMES,self.cut_begin)
 		
 		while(self.cap.get(cv2.CAP_PROP_POS_FRAMES) <= self.cut_end):
 			ret, frame = self.cap.read()
 			if( ret != True):
 				break
-			outVideo.write(frame)
+			if(cutArea is not None):
+				rowBegin,colBegin,rowEnd,colEnd = cutArea
+				#print(rowBegin,colBegin,rowEnd,colEnd)
+				outVideo.write(frame[rowBegin:rowEnd,colBegin:colEnd])
+			else:
+				outVideo.write(frame)
 					
 		outVideo.release()
 		print("cut video complete, saved in %s" %output_name)
@@ -99,6 +113,7 @@ class VideoCutter:
 		self.cap.set(cv2.CAP_PROP_POS_FRAMES,self.cut_begin)
 		return True
 	
+	#
 	def keyParse(self,key):
 		if(ord('s') == key):
 			if((self.cut_begin is not None) and \
@@ -106,6 +121,7 @@ class VideoCutter:
 				prefix = self.video_name.split('.')
 				output_name = prefix[0]+'_out.'+prefix[1]
 				self.cut_video(output_name)
+				self.exitProcess()
 				return False
 			else:
 				print("please set cut begin and end before click 's'")
@@ -116,7 +132,7 @@ class VideoCutter:
 		elif(ord('.') == key and self.videoStatus == PAUSE): #down
 			self.videoStatus = TEMP_RUN
 		elif(ord(',') == key and self.videoStatus == PAUSE): #up
-			self.currentVideoPose -= - 2
+			self.currentVideoPose -= 2
 			if(self.currentVideoPose <=0):
 				self.currentVideoPose = 0
 			self.cap.set(cv2.CAP_PROP_POS_FRAMES,self.currentVideoPose)
@@ -141,13 +157,18 @@ class VideoCutter:
 		totalFrameNumber = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
 		#获取视频帧率
 		self.video_rate = self.cap.get(cv2.CAP_PROP_FPS)
-		self.waitTime = int(1000.0/self.video_rate)
+		self.waitTime = int(500.0/self.video_rate)
+		
+		#获取视频编码格式
+		self.video_fourcc = self.cap.get(cv2.CAP_PROP_FOURCC)
 		
 		print('frames: %.1f \t frame rate: %.1f' %(totalFrameNumber,self.video_rate))
 		sys.stdout.flush()
 		self.video_size = (int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 		
 		cv2.namedWindow(video_name,cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+		self.imageAreaSelecter = ImageAreaSelecter()
+		self.imageAreaSelecter.init(video_name, self.video_size)
 		#cv2.resizeWindow(video_name,640,480)
 		#创建进度条
 		cv2.createTrackbar('Beg',video_name,0,int(totalFrameNumber),self.onCutBeginSliderChanged)
@@ -156,7 +177,25 @@ class VideoCutter:
 		cv2.setTrackbarPos("End",video_name,int(totalFrameNumber))
 		
 		key = -1
+		frame = None
 		while(1):
+			if(frame is not None):
+				key = cv2.waitKey(self.waitTime)
+				if(not self.keyParse(key)):
+					return
+					
+				#图像非空且处于暂停状态,无需向下执行,
+				#若图像非空,务必向下执行以获取新图像
+				if(self.videoStatus == PAUSE or self.videoStatus == STOP):
+					temp_img = frame.copy() #暂停状态下需要拷贝原图后绘制,防止污染源图,导致出现多框
+					#绘制鼠标选定的区域
+					self.imageAreaSelecter.drawSelectTrace(temp_img)
+					cv2.imshow(self.video_name,temp_img)
+					continue
+				else:
+					self.imageAreaSelecter.drawSelectTrace(frame)
+					cv2.imshow(self.video_name,frame)
+				
 			#如果setVideoPose非空,表明外部期望更改视频位置
 			if(self.setVideoPose):
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES,self.setVideoPose)
@@ -164,29 +203,16 @@ class VideoCutter:
 			self.currentVideoPose = self.cap.get(cv2.CAP_PROP_POS_FRAMES)
 			self.posSliderAutoChange = True
 			cv2.setTrackbarPos('Pos',video_name,int(self.currentVideoPose))
+			
 			ret, frame = self.cap.read()
 			if( ret != True): #视频读取完毕
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES,0) #从头播放
 				continue
 			
-			cv2.imshow(self.video_name,frame)
-			
-			#循环等待进入播放状态
-			while(self.videoStatus == PAUSE or self.videoStatus == STOP):
-				key = cv2.waitKey(self.waitTime)
-				if(not self.keyParse(key)):
-					return
-			
-			key = cv2.waitKey(self.waitTime)
-			if(not self.keyParse(key)):
-				return
-			
 			#print(self.videoStatus)
 			#正在运行,按帧率等待
 			if(self.videoStatus == RUNNING):
-				key = cv2.waitKey(self.waitTime)
-				if(not self.keyParse(key)):
-					return
+				pass
 			#临时播放完毕,暂停播放
 			elif(self.videoStatus == TEMP_RUN):
 				self.videoStatus = PAUSE
@@ -200,7 +226,6 @@ class VideoCutter:
 				if(self.currentVideoPose == self.cut_end):#裁剪区循环播放
 					self.cap.set(cv2.CAP_PROP_POS_FRAMES,self.cut_begin)
 				
-			
 			#current_time = self.cap.get(cv2.CAP_PROP_POS_MSEC)/1000
 			#print ('current_frame: %d\t current_time: %.1f' %(current_frame,current_frame))
 			
@@ -220,16 +245,4 @@ if __name__ == '__main__':
 		main(sys.argv)
 	except KeyboardInterrupt:
 		exit()
-
-
-
-
-
-
-
-
-
-
-
-
 
