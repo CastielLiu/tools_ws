@@ -5,7 +5,7 @@ import cv2
 import imageio
 import datetime
 import os
-sys.path.append("lib/")
+sys.path.append(sys.path[0]+"/lib/") #以绝对路径的形式添加模块路径
 from image_mask import imageAddWeighted
 
 def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
@@ -48,6 +48,7 @@ def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
 			imageAddWeighted(img, mask, mask_loc, mask_ratio)
 		
 		print("append image: %s" %imageNames[j])
+		sys.stdout.flush() #强制刷新输出缓冲区
 		
 		if(scale):
 			img =cv2.resize(img,(0,0),fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
@@ -65,9 +66,11 @@ def handle(path,startSeq,endSeq,suffix,duration,resolution,scale=None):
 	duration = duration*1.0/imgCnt
 
 	print("saving %s ..." %outName)
+	sys.stdout.flush() #强制刷新输出缓冲区
 	gif=imageio.mimsave(outName,imageBuf,'GIF',duration=duration)
-
-	print("%s contains %d frame images, total time is %.2fs" %(outName,imgCnt,duration*imgCnt))
+	print("The gif contains %d frame images, total time is %.2fs" %(imgCnt,duration*imgCnt))
+	print("%s saved!" %(outName))
+	sys.stdout.flush() #强制刷新输出缓冲区
 
 #path startSeq,endSeq,suffix,duration 
 def main(argv):
@@ -97,3 +100,4 @@ def main(argv):
 	
 if __name__ == "__main__":
 	main(sys.argv)
+	

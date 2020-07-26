@@ -5,7 +5,7 @@ import cv2
 import imageio
 import os
 
-sys.path.append("lib/")
+sys.path.append(sys.path[0]+"/lib/") #以绝对路径的形式添加模块路径
 from image_mask import imageAdd
 from image_mask import imageStdAdd
 
@@ -147,7 +147,10 @@ class ImagesCutter:
 			out_name = self.out_dir + "/" + imgRelName
 			cv2.imwrite(out_name,out_img)
 			print("%d: %s saved." %(cnt,out_name))
+			sys.stdout.flush() #强制刷新输出缓冲区
 			cnt = cnt + 1
+		print("cutted images saved in %s" %self.out_dir)
+		sys.stdout.flush() #强制刷新输出缓冲区
 			
 def main(argv):
 	if(len(argv) < 3):
@@ -163,7 +166,7 @@ def main(argv):
 		h = int(temp[1])
 		if(w > 0 and h >0):
 			ratio = (w,h)             #裁剪宽高比
-		else
+		else:
 			print("The parameter (w:h) is invalid! ")
 	if(len(argv) > 4):
 		asTargetScale = bool(argv[4]) #使用传入的宽高比数值作为目标尺寸
@@ -175,6 +178,8 @@ def main(argv):
 	app.cut()
 	print("over")
 	cv2.destroyAllWindows()
+
+
 
 if __name__ == "__main__":
 	main(sys.argv)

@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QTimer>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,20 +25,33 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QString appDir, QWidget *parent = nullptr);
     ~MainWindow();
-    void addDataToLogListView(const QString &data);
     void processThread(taskType task);
 
 private slots:
+    void onAddDataToLogListView(const QString &data);
+
     void on_pushButton_video2gif_select_clicked();
 
     void on_pushButton_video2gif_start_clicked();
-
-    void on_tabWidget_currentChanged(int index);
 
     void on_pushButton_forceQuit_clicked();
     void on_pushButton_video2images_select_clicked();
 
     void on_pushButton_video2images_start_clicked();
+
+    void on_pushButton_images2gif_select_clicked();
+
+    void on_pushButton_images2gif_start_clicked();
+
+
+    void on_pushButton_help_clicked();
+
+    void on_pushButton_imagesCutter_select_clicked();
+
+    void on_pushButton_imagesCutter_start_clicked();
+
+signals:
+    void addDataToLogListView(const QString& data);
 
 private:
     void closeEvent(QCloseEvent *event) override;
@@ -51,8 +65,12 @@ private:
 
     Video2gif* m_video2gif;
     Video2images *m_video2images;
+    Images2gif *m_images2gif;
+    ImagesCutter *m_imagesCutter;
+
     int m_lastTabIndex;
 
     QStringListModel m_logModel;
+    std::mutex m_logListViewMutex;
 };
 #endif // MAINWINDOW_H
