@@ -8,13 +8,14 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
 {
     ui->setupUi(this);
 
-    m_toolScriptsDir = m_appDir + "/..";
+    m_toolScriptsDir = m_appDir + "/../..";
     m_video2gif = new Video2gif(m_toolScriptsDir.toStdString());
     m_video2images = new Video2images(m_toolScriptsDir.toStdString());
     m_images2gif = new Images2gif(m_toolScriptsDir.toStdString());
     m_imagesCutter = new ImagesCutter(m_toolScriptsDir.toStdString());
     m_videoCutter = new VideoCutter(m_toolScriptsDir.toStdString());
     m_imagesAddLogo = new ImagesAddLogo(m_toolScriptsDir.toStdString());
+    m_imagesRename = new ImagesRename(m_toolScriptsDir.toStdString());
     m_isProcessing = false;
 
     //移动到屏幕中间
@@ -45,6 +46,7 @@ MainWindow::~MainWindow()
     delete m_imagesCutter;
     delete m_videoCutter;
     delete m_imagesAddLogo;
+    delete m_imagesRename;
 }
 
 void MainWindow::onAction_author_trigger()
@@ -157,6 +159,8 @@ void MainWindow::processThread(taskType task)
         cmd = m_videoCutter->cmd();
     else if(taskType_imagesAddLogo == task)
         cmd = m_imagesAddLogo->cmd();
+    else if(taskType_imagesRename == task)
+        cmd = m_imagesRename->cmd();
 
     emit addDataToLogListView(QString::fromStdString(cmd));
     FILE* fp = popen(cmd.c_str(),"r");
@@ -172,6 +176,10 @@ void MainWindow::processThread(taskType task)
     {
         //std::cout << std::string(buf) << std::endl;
         QString data = QString::fromLocal8Bit(buf);
+
+        if(data[data.length()-1] == '\n')
+            data = data.remove(data.length()-1,1);
+
         emit addDataToLogListView(data);
 
         if(m_forceQuitCurrentTool)
@@ -187,8 +195,8 @@ void MainWindow::processThread(taskType task)
         //std::cout << "close pip"<< std::endl;
         pclose(fp);
     }
-    emit addDataToLogListView("processing ok.");
-    std::cout << "processing ok." << std::endl;
+    emit addDataToLogListView("current image tool exit.\n");
+    //std::cout << "processing ok." << std::endl;
     m_isProcessing = false;
 }
 
@@ -301,6 +309,11 @@ void MainWindow::on_pushButton_help_clicked()
         title = tr("图片批量添加logo");
         content = g_toolDescription_imagesAddLogo;
     }
+    else if(ui->tabWidget->currentIndex()==tabWidgetTab_imagesRename)
+    {
+        title = tr("图片批量重命名");
+        content = g_toolDescription_imagesRename;
+    }
 
     QMessageBox::information(this,title,content);
 }
@@ -375,5 +388,35 @@ void MainWindow::on_pushButton_imagesAddLogo_start_clicked()
     m_imagesAddLogo->add_mode = std::to_string(ui->comboBox_imagesAddLogo_mode->currentIndex());
 
     std::thread t(&MainWindow::processThread,this,taskType_imagesAddLogo);
+    t.detach();
+}
+
+void MainWindow::on_pushButton_imagesRename_select_clicked()
+{
+    QString imageDir = QFileDialog::getExistingDirectory(this,tr("选择图片路径"),"/home",QFileDialog::ReadOnly);
+    ui->lineEdit_imagesRename_imageDir->setText(imageDir);
+}
+
+void MainWindow::on_pushButton_imagesRename_start_clicked()
+{
+    if(ui->lineEdit_imagesRename_imageDir->text().isEmpty())
+    {
+        addDataToLogListView(tr("输入错误: 图片路径为空"));
+        return;
+    }
+    bool ok ;
+    ui->lineEdit_imagesRename_startSeq->text().toInt(&ok);
+    if(!ok)
+    {
+        ui->lineEdit_imagesRename_startSeq->setText("1");
+        addDataToLogListView(tr("输入错误: 起始编号应为数字, 自动修改为默认值1, 请重新运行."));
+        return;
+    }
+
+    m_imagesRename->images_dir = ui->lineEdit_imagesRename_imageDir->text().toStdString();
+    m_imagesRename->image_suffix = ui->comboBox_imagesRename_imgType->currentText().toStdString();
+    m_imagesRename->start_seq = ui->lineEdit_imagesRename_startSeq->text().toStdString();
+
+    std::thread t(&MainWindow::processThread,this,taskType_imagesRename);
     t.detach();
 }

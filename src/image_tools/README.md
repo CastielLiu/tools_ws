@@ -101,18 +101,18 @@
     若输入参数中包含宽高比，选择框自动按比例显示，若输入asTargetScale参数为1，图像将缩放为w:h输出
 
 ### images_rename.py
-    批量图片重命名, 用于多个文件夹图像合并预处理，前提是图像文件名为有序数字　1.jpg + 10 = 11.jpg
+    批量图片重命名, 用于多个文件夹图像合并预处理，前提是图像文件名为有序数字　
+    首先列出文件夹中所有指定类型的图片，根据其数字名称进行排序，
+    将排序后的图像文件，按照startSeq++的顺序重命名为中间文件，最后再将中间文件命名为目标文件
+    自动过滤文件名不是数字的图片文件
 
 * **`argvs`**
     1. path     　　　图片路径   image/
     2. suffix   　　　图片后缀名 jpg
-    3. startSeq      图像起始编号
-    4. endSeq        图像中止编号
-    5. addNum        文件名增量 例如1.jpg + 10 = 11.jpg
+    3. startSeq      输出图像起始编号
 
 * **`run`**
-    python images_rename.py path suffix startSeq endSeq addNum
+    python images_rename.py path suffix startSeq
 
-    就地修改文件名，内置安全保护，可避免图像文件被覆盖
 
 

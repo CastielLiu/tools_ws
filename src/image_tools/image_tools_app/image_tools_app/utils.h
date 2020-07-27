@@ -48,6 +48,13 @@ const QString g_toolDescription_imagesAddLogo =
                 "点击's'保存图像，点击'q'退出工具\n"
                 "滑动Alpha滚动条可更改logo透明度");
 
+const QString g_toolDescription_imagesRename =
+        QString("图片批量重命名,直接修改文件名,不保留副本\n"
+                "输出文件顺序与原文件数字顺序相同, 内置转存机制, 不会导致文件丢失\n\n"
+                "图片路径: 需要重命名的图像所在位置\n"
+                "图片类型: 图片后缀名\n"
+                "起始编号: 输出文件的最小编号值, 文件名称依次递增\n");
+
 
 enum taskType
 {
@@ -57,6 +64,7 @@ enum taskType
     taskType_videoCutter,
     taskType_imagesCutter,
     taskType_imagesAddLogo,
+    taskType_imagesRename,
 };
 
 enum tabWidgetTab
@@ -67,6 +75,7 @@ enum tabWidgetTab
     tabWidgetTab_videoCutter ,
     tabWidgetTab_imagesCutter,
     tabWidgetTab_imagesAddLogo,
+    tabWidgetTab_imagesRename,
 };
 
 class Video2gif
@@ -202,6 +211,27 @@ public:
         std::string _cmd = std::string("python ")+tool_script+" "+images_dir + " "
                                                  +image_suffix + " "
                                                  +logo + " " + add_mode;
+        return _cmd;
+    }
+};
+
+class ImagesRename
+{
+public:
+    ImagesRename(const std::string& scriptsDir)
+    {
+        tool_script = scriptsDir + "/images_rename.py";
+    }
+    std::string tool_script;
+    std::string images_dir;
+    std::string image_suffix;
+    std::string start_seq;
+
+    std::string cmd()
+    {
+        std::string _cmd = std::string("python ")+tool_script+" "+images_dir + " "
+                                                 +image_suffix + " "
+                                                 +start_seq;
         return _cmd;
     }
 };

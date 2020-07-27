@@ -48,6 +48,10 @@ private slots:
     void on_pushButton_imagesAddLogo_start_clicked();
     void onAction_author_trigger();
 
+    void on_pushButton_imagesRename_select_clicked();
+
+    void on_pushButton_imagesRename_start_clicked();
+
 signals:
     void addDataToLogListView(const QString& data);
 
@@ -67,6 +71,7 @@ private:
     ImagesCutter  *m_imagesCutter;
     VideoCutter   *m_videoCutter;
     ImagesAddLogo *m_imagesAddLogo;
+    ImagesRename  *m_imagesRename;
 
     int m_lastTabIndex;
 

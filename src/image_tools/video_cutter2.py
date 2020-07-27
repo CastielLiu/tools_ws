@@ -7,11 +7,18 @@ sys.path.append(sys.path[0]+"/lib")
 from image_area_selecter import ImageAreaSelecter
 
 PAUSE = 0
-STOP = 1
+SAVING = 1
 RUNNING = 2
 TEMP_RUN = 3
 DISPLAY_CUT_BLOCK = 4
 READY_DISPLAY_CUT_BLOCK = 5
+
+#状态机　RUNNING  ->  PAUSE   空格
+#状态机　PAUSE    ->  RUNNING 空格
+#状态机　PAUSE    ->  TEMP_RUN -> PAUSE 拖动播放进度条
+#状态机　ANY -> READY_DISPLAY_CUT_BLOCK ->  DISPLAY_CUT_BLOCK 　'd'键
+#状态机　ANY -> SAVING 's'键
+
 
 class VideoCutter:
 	def __init__(self):
@@ -43,7 +50,7 @@ class VideoCutter:
 		exit(0)
 	
 	def onVideoPosSliderChanged(self,pos):
-		if(self.videoStatus != DISPLAY_CUT_BLOCK):
+		if(self.videoStatus != DISPLAY_CUT_BLOCK): #非展示裁剪区域状态下,裁剪终点进度条随视频位置变化
 			cv2.setTrackbarPos('End',self.video_name,pos)
 		if(self.posSliderAutoChange):#视频进度条为自动更新,无需调整手动视频位置
 			self.posSliderAutoChange = False
@@ -209,8 +216,7 @@ class VideoCutter:
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES,0) #从头播放
 				continue
 			
-			#print(self.videoStatus)
-			#正在运行,按帧率等待
+			#正在运行,无需操作
 			if(self.videoStatus == RUNNING):
 				pass
 			#临时播放完毕,暂停播放

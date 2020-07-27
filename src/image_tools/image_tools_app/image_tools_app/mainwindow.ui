@@ -6,18 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>722</width>
-    <height>424</height>
+    <width>735</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <property name="windowIcon">
-   <iconset theme=":/images/icon"/>
+   <iconset theme=":/images/icon">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,1">
+   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10,1">
     <item>
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
@@ -54,7 +55,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>5</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="tab_video2gif">
          <attribute name="title">
@@ -842,6 +843,103 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_imagesRename">
+         <attribute name="title">
+          <string>图片重命名</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_19">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <item>
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>图片路径</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_imagesRename_imageDir">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_imagesRename_select">
+              <property name="text">
+               <string>选择路径</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="1,1,1,1,10,0">
+            <item>
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>图片类型</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_imagesRename_imgType">
+              <item>
+               <property name="text">
+                <string>jpg</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>png</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_24">
+              <property name="text">
+               <string>起始编号</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_imagesRename_startSeq">
+              <property name="text">
+               <string>1</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_imagesRename_start">
+              <property name="text">
+               <string>开始运行</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
       <item>
@@ -897,7 +995,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>722</width>
+     <width>735</width>
      <height>28</height>
     </rect>
    </property>
