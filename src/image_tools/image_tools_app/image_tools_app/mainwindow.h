@@ -46,7 +46,7 @@ private slots:
     void on_pushButton_imagesAddLogo_selectImageDir_clicked();
     void on_pushButton_imagesAddLogo_selectLogo_clicked();
     void on_pushButton_imagesAddLogo_start_clicked();
-    void on_action_author_trigger();
+    void onAction_author_trigger();
 
 signals:
     void addDataToLogListView(const QString& data);

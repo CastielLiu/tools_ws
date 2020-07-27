@@ -6,6 +6,8 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     ui(new Ui::MainWindow),
     m_appDir(appDir)
 {
+    ui->setupUi(this);
+
     m_toolScriptsDir = m_appDir + "/..";
     m_video2gif = new Video2gif(m_toolScriptsDir.toStdString());
     m_video2images = new Video2images(m_toolScriptsDir.toStdString());
@@ -15,21 +17,21 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     m_imagesAddLogo = new ImagesAddLogo(m_toolScriptsDir.toStdString());
     m_isProcessing = false;
 
-    this->setWindowTitle(tr("图像/视频处理工具"));
-
     //移动到屏幕中间
     QDesktopWidget *deskdop = QApplication::desktop();
     move((deskdop->width() - this->width())/2, (deskdop->height() - this->height())/2);
 
-    ui->setupUi(this);
+    setWindowTitle(tr("图像/视频处理工具"));
+    setWindowIcon(QIcon(":/images/resouces/icon.jpg"));
+
     ui->listView_log->setModel(&m_logModel);
     ui->tabWidget->setCurrentIndex(tabWidgetTab_video2gif);
     //手动发送信号，以更新内容
     emit ui->tabWidget->currentChanged(tabWidgetTab_video2gif);
 
     connect(this, SIGNAL(addDataToLogListView(const QString&)), this, SLOT(onAddDataToLogListView(const QString&)));
-    connect(ui->action_author, SIGNAL(triggered()), this, SLOT(on_action_author_trigger()));
-    QMessageBox::information(this,tr("温馨提示"),tr("文件或路径中请勿包含中文，否则可能出现异常错误！"));
+    connect(ui->action_author, SIGNAL(triggered()), this, SLOT(onAction_author_trigger()));
+    //QMessageBox::information(this,tr("温馨提示"),tr("文件或路径中请勿包含中文，否则可能出现异常错误！"));
 }
 
 MainWindow::~MainWindow()
@@ -45,7 +47,7 @@ MainWindow::~MainWindow()
     delete m_imagesAddLogo;
 }
 
-void MainWindow::on_action_author_trigger()
+void MainWindow::onAction_author_trigger()
 {
     QMessageBox::information(this,tr("作者信息"),tr("作者: 文刀\n单位: 东南大学\n邮箱: castiel_liu@outlook.com"));
 }
