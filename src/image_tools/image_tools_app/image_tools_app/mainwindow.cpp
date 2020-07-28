@@ -26,13 +26,21 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     setWindowIcon(QIcon(":/images/resouces/icon.jpg"));
 
     ui->listView_log->setModel(&m_logModel);
-    ui->tabWidget->setCurrentIndex(tabWidgetTab_video2gif);
+    ui->stackedWidget->setCurrentIndex(0);
+    ui->tabWidget_imageTools->setCurrentIndex(0);
+    ui->tabWidget_videoTools->setCurrentIndex(0);
     //手动发送信号，以更新内容
-    emit ui->tabWidget->currentChanged(tabWidgetTab_video2gif);
+    //emit ui->tabWidget_imageTools->currentChanged(0);
 
     connect(this, SIGNAL(addDataToLogListView(const QString&)), this, SLOT(onAddDataToLogListView(const QString&)));
     connect(ui->action_author, SIGNAL(triggered()), this, SLOT(onAction_author_trigger()));
-    //QMessageBox::information(this,tr("温馨提示"),tr("文件或路径中请勿包含中文，否则可能出现异常错误！"));
+    QMessageBox::information(this,tr("温馨提示"),tr("文件或路径中请勿包含中文，否则可能出现异常错误！"));
+    configToolBar();
+}
+
+void MainWindow::configToolBar()
+{
+    //QAction *videoToolAction = ui->toolBar->addAction(tr("视频处理工具"));
 }
 
 MainWindow::~MainWindow()
@@ -263,6 +271,11 @@ void MainWindow::on_pushButton_images2gif_select_clicked()
 
 void MainWindow::on_pushButton_images2gif_start_clicked()
 {
+    if(ui->lineEdit_images2gif_imagePath->text().isEmpty())
+    {
+        addDataToLogListView(tr("输入错误: 图片路径为空"));
+        return;
+    }
     m_images2gif->img_dir = ui->lineEdit_images2gif_imagePath->text().toStdString();
     m_images2gif->start_seq = ui->lineEdit_images2gif_startSeq->text().toStdString();
     m_images2gif->end_seq = ui->lineEdit_images2gif_endSeq->text().toStdString();
@@ -277,44 +290,24 @@ void MainWindow::on_pushButton_images2gif_start_clicked()
 
 void MainWindow::on_pushButton_help_clicked()
 {
-    QString title;
+    QString title = tr("帮助");
     QString content;
-    if(ui->tabWidget->currentIndex()==tabWidgetTab_video2gif)
+    if(ui->stackedWidget->currentIndex() == stackWidget_imageTools)
     {
-        title = tr("视频转gif");
-        content = g_toolDescription_video2gif;
+        size_t index = ui->tabWidget_imageTools->currentIndex();
+        if(index >= g_imageToolsDiscription.size())
+            content = "无描述";
+        else
+            content = g_imageToolsDiscription[index];
     }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_images2gif)
+    else if(ui->stackedWidget->currentIndex() == stackWidget_videoTools)
     {
-        title = tr("图片转gif");
-        content = g_toolDescription_images2gif;
+        size_t index = ui->tabWidget_videoTools->currentIndex();
+        if(index >= g_videoToolsDiscription.size())
+            content = "无描述";
+        else
+            content = g_videoToolsDiscription[index];
     }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_video2images)
-    {
-        title = tr("视频拆分图片");
-        content = g_toolDescription_video2images;
-    }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_imagesCutter)
-    {
-        title = tr("图片批量裁剪");
-        content = g_toolDescription_imagesCutter;
-    }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_videoCutter)
-    {
-        title = tr("视频裁剪");
-        content = g_toolDescription_videoCutter;
-    }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_imagesAddLogo)
-    {
-        title = tr("图片批量添加logo");
-        content = g_toolDescription_imagesAddLogo;
-    }
-    else if(ui->tabWidget->currentIndex()==tabWidgetTab_imagesRename)
-    {
-        title = tr("图片批量重命名");
-        content = g_toolDescription_imagesRename;
-    }
-
     QMessageBox::information(this,title,content);
 }
 
@@ -328,6 +321,12 @@ void MainWindow::on_pushButton_imagesCutter_select_clicked()
 
 void MainWindow::on_pushButton_imagesCutter_start_clicked()
 {
+    if(ui->lineEdit_imagesCutter_imagePath->text().isEmpty())
+    {
+        addDataToLogListView(tr("输入错误: 图片路径为空"));
+        return;
+    }
+
     m_imagesCutter->images_dir = ui->lineEdit_imagesCutter_imagePath->text().toStdString();
     m_imagesCutter->image_suffix = ui->comboBox_imagesCutter_imageType->currentText().toStdString();
     m_imagesCutter->expect_w = ui->lineEdit_imagesCutter_w->text().toStdString();
@@ -348,6 +347,11 @@ void MainWindow::on_pushButton_videoCutter_select_clicked()
 
 void MainWindow::on_pushButton_videoCutter_start_clicked()
 {
+    if(ui->lineEdit_videoCutter_video->text().isEmpty())
+    {
+        addDataToLogListView(tr("输入错误: 视频文件为空"));
+        return;
+    }
     m_videoCutter->video_name = ui->lineEdit_videoCutter_video->text().toStdString();
 
     std::thread t(&MainWindow::processThread,this,taskType_videoCutter);
@@ -419,4 +423,67 @@ void MainWindow::on_pushButton_imagesRename_start_clicked()
 
     std::thread t(&MainWindow::processThread,this,taskType_imagesRename);
     t.detach();
+}
+
+void MainWindow::on_tabWidget_imageTools_currentChanged(int index)
+{
+    if(ui->tabWidget_imageTools->currentWidget()->objectName() == "tab_changeToVideoTools")
+    {
+        ui->stackedWidget->setCurrentIndex(stackWidget_videoTools);
+        ui->tabWidget_imageTools->setCurrentIndex(0);
+    }
+}
+
+void MainWindow::on_tabWidget_videoTools_currentChanged(int index)
+{
+    if(ui->tabWidget_videoTools->currentWidget()->objectName() == "tab_changeToImageTools")
+    {
+        ui->stackedWidget->setCurrentIndex(stackWidget_imageTools);
+        ui->tabWidget_videoTools->setCurrentIndex(0);
+        //qDebug() << ui->tabWidget_videoTools->currentIndex();
+    }
+}
+
+void MainWindow::on_pushButton_videoAudio_selectVideo_clicked()
+{
+    QString video = QFileDialog::getOpenFileName(this,tr("视频文件"),"/home");
+    if(video.isEmpty())
+        return;
+    ui->lineEdit_videoAudio_video->setText(video);
+    ui->lineEdit_videoAudio_video->setAlignment(Qt::AlignRight);
+}
+
+void MainWindow::on_pushButton_videoAudio_selectAudio_clicked()
+{
+    QString audio = QFileDialog::getOpenFileName(this,tr("音频文件"),"/home","*.mp3 *.wav");
+    if(audio.isEmpty())
+        return;
+    ui->lineEdit_videoAudio_audio->setText(audio);
+    ui->lineEdit_videoAudio_audio->setAlignment(Qt::AlignRight);
+}
+
+void MainWindow::on_pushButton_videoAudio_start_clicked()
+{
+    int toolsType = ui->comboBox_videoAudio_operateType->currentIndex();
+    if(toolsType == videoAudioToolsType_addAudio)
+    {
+
+    }
+    else if(toolsType == videoAudioToolsType_extractAudio)
+    {
+
+    }
+    else if(toolsType == videoAudioToolsType_videooTransFormat)
+    {
+
+    }
+    else if(toolsType == videoAudioToolsType_audioTransFormat)
+    {
+
+    }
+}
+
+void MainWindow::on_comboBox_videoAudio_operateType_currentIndexChanged(int index)
+{
+    ui->stackedWidget_videoAudioTools->setCurrentIndex(index);
 }

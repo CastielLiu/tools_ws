@@ -193,7 +193,7 @@ class VideoCutter:
 					
 				#图像非空且处于暂停状态,无需向下执行,
 				#若图像非空,务必向下执行以获取新图像
-				if(self.videoStatus == PAUSE or self.videoStatus == STOP):
+				if(self.videoStatus == PAUSE):
 					temp_img = frame.copy() #暂停状态下需要拷贝原图后绘制,防止污染源图,导致出现多框
 					#绘制鼠标选定的区域
 					self.imageAreaSelecter.drawSelectTrace(temp_img)

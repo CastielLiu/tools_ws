@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QString appDir, QWidget *parent = nullptr);
     ~MainWindow();
+    void configToolBar();
     void processThread(taskType task);
     void showInfo();
 
@@ -49,8 +50,18 @@ private slots:
     void onAction_author_trigger();
 
     void on_pushButton_imagesRename_select_clicked();
-
     void on_pushButton_imagesRename_start_clicked();
+    void on_tabWidget_imageTools_currentChanged(int index);
+
+    void on_tabWidget_videoTools_currentChanged(int index);
+
+    void on_pushButton_videoAudio_selectVideo_clicked();
+
+    void on_pushButton_videoAudio_selectAudio_clicked();
+
+    void on_pushButton_videoAudio_start_clicked();
+
+    void on_comboBox_videoAudio_operateType_currentIndexChanged(int index);
 
 signals:
     void addDataToLogListView(const QString& data);

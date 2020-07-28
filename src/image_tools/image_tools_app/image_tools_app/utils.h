@@ -2,6 +2,7 @@
 #define UTILS_H
 #include <iostream>
 #include <QString>
+#include <vector>
 
 const QString g_toolDescription_video2gif =
         QString("图片间隔: 视频帧间隔采样\n"
@@ -56,26 +57,68 @@ const QString g_toolDescription_imagesRename =
                 "起始编号: 输出文件的最小编号值, 文件名称依次递增\n");
 
 
+//任务类型，用于选择对应的工具
+//顺序可更改
 enum taskType
 {
-    taskType_video2gif,
     taskType_images2gif,
-    taskType_video2images,
-    taskType_videoCutter,
     taskType_imagesCutter,
     taskType_imagesAddLogo,
     taskType_imagesRename,
+
+
+    taskType_video2gif,
+    taskType_video2images,
+    taskType_videoCutter,
+
 };
 
-enum tabWidgetTab
+//应与实际索引一致
+enum stackWidget
 {
-    tabWidgetTab_video2gif ,
-    tabWidgetTab_images2gif,
-    tabWidgetTab_video2images ,
-    tabWidgetTab_videoCutter ,
-    tabWidgetTab_imagesCutter,
-    tabWidgetTab_imagesAddLogo,
-    tabWidgetTab_imagesRename,
+    stackWidget_imageTools = 0,
+    stackWidget_videoTools = 1,
+};
+
+//图片工具tabWidget索引，应与实际索引一致
+enum imageToolsWidget_Tab
+{
+    imageToolsWidget_Tab_images2gif,
+    imageToolsWidget_Tab_imagesCutter,
+    imageToolsWidget_Tab_imagesAddLogo,
+    imageToolsWidget_Tab_imagesRename,
+};
+
+//图片工具描述，顺序应与imageToolsWidget_Tab对应
+static std::vector<QString> g_imageToolsDiscription = {
+    g_toolDescription_images2gif,
+    g_toolDescription_imagesCutter,
+    g_toolDescription_imagesAddLogo,
+    g_toolDescription_imagesRename
+};
+
+//视频工具tabWidget索引，应与实际索引一致
+enum videoToolsWidget_Tab
+{
+    videoToolsWidget_Tab_video2gif ,
+    videoToolsWidget_Tab_video2images ,
+    videoToolsWidget_Tab_videoCutter ,
+};
+
+//视频工具描述，顺序应与videoToolsWidget_Tab对应
+static std::vector<QString> g_videoToolsDiscription = {
+    g_toolDescription_video2gif,
+    g_toolDescription_video2images,
+    g_toolDescription_videoCutter
+};
+
+//视频音频stackWidget索引，应与实际索引一致
+enum videoAudioToolsType
+{
+    videoAudioToolsType_addAudio,
+    videoAudioToolsType_extractAudio,
+    videoAudioToolsType_videooTransFormat,
+    videoAudioToolsType_audioTransFormat,
 };
 
 class Video2gif
