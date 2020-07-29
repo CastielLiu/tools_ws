@@ -76,13 +76,14 @@ private:
     bool m_isProcessing;
     bool m_forceQuitCurrentTool;
 
-    Video2gif     *m_video2gif;
-    Video2images  *m_video2images;
-    Images2gif    *m_images2gif;
-    ImagesCutter  *m_imagesCutter;
-    VideoCutter   *m_videoCutter;
-    ImagesAddLogo *m_imagesAddLogo;
-    ImagesRename  *m_imagesRename;
+    Video2gif      *m_video2gif;
+    Video2images   *m_video2images;
+    Images2gif     *m_images2gif;
+    ImagesCutter   *m_imagesCutter;
+    VideoCutter    *m_videoCutter;
+    ImagesAddLogo  *m_imagesAddLogo;
+    ImagesRename   *m_imagesRename;
+    VideoAudioTool *m_videoAudio;
 
     int m_lastTabIndex;
 

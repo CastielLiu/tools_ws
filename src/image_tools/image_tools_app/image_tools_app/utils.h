@@ -3,6 +3,8 @@
 #include <iostream>
 #include <QString>
 #include <vector>
+#include <cstdio>
+
 
 const QString g_toolDescription_video2gif =
         QString("图片间隔: 视频帧间隔采样\n"
@@ -66,11 +68,13 @@ enum taskType
     taskType_imagesAddLogo,
     taskType_imagesRename,
 
-
     taskType_video2gif,
     taskType_video2images,
     taskType_videoCutter,
-
+    taskType_videoAddAudio,
+    taskType_videoExtractAudio,
+    taskType_videoTransFormat,
+    taskType_audioTransFormat,
 };
 
 //应与实际索引一致
@@ -117,7 +121,7 @@ enum videoAudioToolsType
 {
     videoAudioToolsType_addAudio,
     videoAudioToolsType_extractAudio,
-    videoAudioToolsType_videooTransFormat,
+    videoAudioToolsType_videoTransFormat,
     videoAudioToolsType_audioTransFormat,
 };
 
@@ -278,6 +282,68 @@ public:
         return _cmd;
     }
 };
+
+class VideoAudioTool
+{
+public:
+    VideoAudioTool(taskType _type)
+    {
+        type = _type;
+    }
+    std::string cmd()
+    {
+        std::string out_cmd;
+        if(type == taskType_videoAddAudio)
+        {
+            int dotIndex = inputVideo.find_last_of('.');
+            std::string prefix = inputVideo.substr(0,dotIndex);
+            std::string suffix = inputVideo.substr(dotIndex,inputVideo.length());
+            std::string outName = prefix + "_out." + suffix;
+
+            out_cmd =  std::string("ffmpeg -i ") + inputVideo + " -i " + inputAudio +
+                        " -strict -2 -vn " + outName;
+        }
+        else if(type == taskType_videoExtractAudio)
+        {
+            int dotIndex = inputVideo.find_last_of('.');
+            std::string prefix = inputVideo.substr(0,dotIndex);
+            //std::string suffix = inputVideo.substr(dotIndex,inputVideo.length());
+            std::string outName = prefix + "_out." + outputFormat;
+            out_cmd =  std::string("ffmpeg -i ") + inputVideo + " -vn " + outName;
+        }
+        else if(type == taskType_videoTransFormat)
+        {
+            int dotIndex = inputVideo.find_last_of('.');
+            std::string prefix = inputVideo.substr(0,dotIndex);
+            std::string outName = prefix + "_out." + outputFormat;
+            out_cmd =  std::string("ffmpeg -i ") + inputVideo + " -strict -2 " + outName;
+        }
+        else if(type == taskType_audioTransFormat)
+        {
+            int dotIndex = inputAudio.find_last_of('.');
+            std::string prefix = inputAudio.substr(0,dotIndex);
+            std::string outName = prefix + "_out." + outputFormat;
+            out_cmd =  std::string("ffmpeg -i ") + inputAudio + " -strict -2 " + outName;
+        }
+
+        return out_cmd + " -hide_banner";
+    }
+
+    taskType type;
+    std::string inputAudio;
+    std::string inputVideo;
+    std::string output;
+    std::string outputFormat;
+    bool audioCyclePlay;
+
+    std::string _cmd;
+};
+
+static void runCmdInShell(const std::string& cmd)
+{
+    std::string res = std::string("gnome-terminal -x bash -c ") + "\"" + cmd + "; read \"";
+    system(res.c_str());
+}
 
 
 #endif // UTILS_H

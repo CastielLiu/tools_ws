@@ -16,6 +16,7 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     m_videoCutter = new VideoCutter(m_toolScriptsDir.toStdString());
     m_imagesAddLogo = new ImagesAddLogo(m_toolScriptsDir.toStdString());
     m_imagesRename = new ImagesRename(m_toolScriptsDir.toStdString());
+    m_videoAudio = nullptr;
     m_isProcessing = false;
 
     //移动到屏幕中间
@@ -55,6 +56,8 @@ MainWindow::~MainWindow()
     delete m_videoCutter;
     delete m_imagesAddLogo;
     delete m_imagesRename;
+    if(m_videoAudio!=nullptr)
+        delete m_videoAudio;
 }
 
 void MainWindow::onAction_author_trigger()
@@ -169,6 +172,17 @@ void MainWindow::processThread(taskType task)
         cmd = m_imagesAddLogo->cmd();
     else if(taskType_imagesRename == task)
         cmd = m_imagesRename->cmd();
+    else if(taskType_videoAddAudio == task ||
+            taskType_videoExtractAudio == task ||
+            taskType_videoTransFormat == task ||
+            taskType_audioTransFormat == task)
+    {
+        cmd = m_videoAudio->cmd();
+        runCmdInShell(cmd);
+        emit addDataToLogListView(tr("工具正在终端中运行……"));
+        m_isProcessing = false;
+        return;
+    }
 
     emit addDataToLogListView(QString::fromStdString(cmd));
     FILE* fp = popen(cmd.c_str(),"r");
@@ -430,7 +444,7 @@ void MainWindow::on_tabWidget_imageTools_currentChanged(int index)
     if(ui->tabWidget_imageTools->currentWidget()->objectName() == "tab_changeToVideoTools")
     {
         ui->stackedWidget->setCurrentIndex(stackWidget_videoTools);
-        ui->tabWidget_imageTools->setCurrentIndex(0);
+        ui->tabWidget_videoTools->setCurrentIndex(0);
     }
 }
 
@@ -439,8 +453,13 @@ void MainWindow::on_tabWidget_videoTools_currentChanged(int index)
     if(ui->tabWidget_videoTools->currentWidget()->objectName() == "tab_changeToImageTools")
     {
         ui->stackedWidget->setCurrentIndex(stackWidget_imageTools);
-        ui->tabWidget_videoTools->setCurrentIndex(0);
+        ui->tabWidget_imageTools->setCurrentIndex(0);
         //qDebug() << ui->tabWidget_videoTools->currentIndex();
+    }
+    else if(ui->tabWidget_videoTools->currentWidget()->objectName() == "tab_videoAudio")
+    {
+        ui->comboBox_videoAudio_operateType->setCurrentIndex(0);
+        emit ui->comboBox_videoAudio_operateType->currentIndexChanged(0);
     }
 }
 
@@ -464,25 +483,67 @@ void MainWindow::on_pushButton_videoAudio_selectAudio_clicked()
 
 void MainWindow::on_pushButton_videoAudio_start_clicked()
 {
+    if(m_isProcessing)
+    {
+        onAddDataToLogListView("system is processing now, please try again a later.");
+        return;
+    }
+
+    if(m_videoAudio != nullptr)
+        delete m_videoAudio;
+
     int toolsType = ui->comboBox_videoAudio_operateType->currentIndex();
+
     if(toolsType == videoAudioToolsType_addAudio)
     {
+        m_videoAudio = new VideoAudioTool(taskType_videoAddAudio);
+        m_videoAudio->inputVideo = ui->lineEdit_videoAudio_video->text().toStdString();
+        m_videoAudio->inputAudio = ui->lineEdit_videoAudio_audio->text().toStdString();
 
+        if(m_videoAudio->inputVideo.empty() || m_videoAudio->inputAudio.empty())
+        {
+            addDataToLogListView(tr("输入错误: 视频/音频文件为空"));
+            return;
+        }
     }
     else if(toolsType == videoAudioToolsType_extractAudio)
     {
-
+        m_videoAudio = new VideoAudioTool(taskType_videoExtractAudio);
+        m_videoAudio->inputVideo = ui->lineEdit_videoAudio_video->text().toStdString();
+        m_videoAudio->outputFormat = ui->comboBox_videoAudio_extractAudioFormat->currentText().toStdString();
+        if(m_videoAudio->inputVideo.empty())
+        {
+            addDataToLogListView(tr("输入错误: 视频文件为空"));
+            return;
+        }
     }
-    else if(toolsType == videoAudioToolsType_videooTransFormat)
+    else if(toolsType == videoAudioToolsType_videoTransFormat)
     {
-
+        m_videoAudio = new VideoAudioTool(taskType_videoTransFormat);
+        m_videoAudio->inputVideo = ui->lineEdit_videoAudio_video->text().toStdString();
+        m_videoAudio->outputFormat = ui->comboBox_videoAudio_transVideoFormat->currentText().toStdString();
+        if(m_videoAudio->inputVideo.empty())
+        {
+            addDataToLogListView(tr("输入错误: 视频文件为空"));
+            return;
+        }
     }
     else if(toolsType == videoAudioToolsType_audioTransFormat)
     {
-
+        m_videoAudio = new VideoAudioTool(taskType_audioTransFormat);
+        m_videoAudio->inputAudio = ui->lineEdit_videoAudio_audio->text().toStdString();
+        m_videoAudio->outputFormat = ui->comboBox_videoAudio_transAudioFormat->currentText().toStdString();
+        if(m_videoAudio->inputAudio.empty())
+        {
+            addDataToLogListView(tr("输入错误: 视频音频为空"));
+            return;
+        }
     }
+    std::thread t(&MainWindow::processThread,this,m_videoAudio->type);
+    t.detach();
 }
 
+//使得stackWidget随comboBox切换
 void MainWindow::on_comboBox_videoAudio_operateType_currentIndexChanged(int index)
 {
     ui->stackedWidget_videoAudioTools->setCurrentIndex(index);
