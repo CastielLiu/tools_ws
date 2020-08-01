@@ -168,6 +168,7 @@ class VideoCutter:
 		
 		#获取视频编码格式
 		self.video_fourcc = self.cap.get(cv2.CAP_PROP_FOURCC)
+		print(self.video_fourcc)
 		
 		print('frames: %.1f \t frame rate: %.1f' %(totalFrameNumber,self.video_rate))
 		sys.stdout.flush()

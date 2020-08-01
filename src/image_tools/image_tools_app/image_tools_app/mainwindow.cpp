@@ -12,6 +12,7 @@ MainWindow::MainWindow(QString appDir, QWidget *parent):
     m_video2gif = new Video2gif(m_toolScriptsDir.toStdString());
     m_video2images = new Video2images(m_toolScriptsDir.toStdString());
     m_images2gif = new Images2gif(m_toolScriptsDir.toStdString());
+    m_images2video =new Images2video(m_toolScriptsDir.toStdString());
     m_imagesCutter = new ImagesCutter(m_toolScriptsDir.toStdString());
     m_videoCutter = new VideoCutter(m_toolScriptsDir.toStdString());
     m_imagesAddLogo = new ImagesAddLogo(m_toolScriptsDir.toStdString());
@@ -56,6 +57,7 @@ MainWindow::~MainWindow()
     delete m_videoCutter;
     delete m_imagesAddLogo;
     delete m_imagesRename;
+    delete  m_images2video;
     if(m_videoAudio!=nullptr)
         delete m_videoAudio;
 }
@@ -100,6 +102,36 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     else
         event->ignore();
+}
+
+/*@brief 禁用/启用，当前表格外的其他表格
+ *
+ */
+void MainWindow::setOtherTabEnabled(QTabWidget* tabWidget, bool flag)
+{
+    int currentIndex = tabWidget->currentIndex();
+    for(int index=0; index<tabWidget->count(); ++index)
+    {
+        if(index == currentIndex)
+            continue;
+        else
+            tabWidget->setTabEnabled(index,flag);
+    }
+}
+
+void MainWindow::setIsProcessing(bool flag)
+{
+    m_isProcessing = flag;
+    if(m_isProcessing)
+    {
+        setOtherTabEnabled(ui->tabWidget_imageTools,false);
+        setOtherTabEnabled(ui->tabWidget_videoTools,false);
+    }
+    else
+    {
+        setOtherTabEnabled(ui->tabWidget_imageTools,true);
+        setOtherTabEnabled(ui->tabWidget_videoTools,true);
+    }
 }
 
 void MainWindow::onAddDataToLogListView(const QString& data)
@@ -155,7 +187,7 @@ void MainWindow::processThread(taskType task)
         return;
     }
 
-    m_isProcessing = true;
+    setIsProcessing(true);
     std::string cmd;
 
     if(taskType_video2gif == task)
@@ -164,6 +196,8 @@ void MainWindow::processThread(taskType task)
         cmd = m_video2images->cmd();
     else if(taskType_images2gif == task)
         cmd = m_images2gif->cmd();
+    else if(taskType_images2video == task)
+        cmd = m_images2video->cmd();
     else if(taskType_imagesCutter == task)
         cmd = m_imagesCutter->cmd();
     else if(taskType_videoCutter == task)
@@ -180,7 +214,7 @@ void MainWindow::processThread(taskType task)
         cmd = m_videoAudio->cmd();
         runCmdInShell(cmd);
         emit addDataToLogListView(tr("工具正在终端中运行……"));
-        m_isProcessing = false;
+        setIsProcessing(false);
         return;
     }
 
@@ -189,7 +223,7 @@ void MainWindow::processThread(taskType task)
     if(fp == nullptr)
     {
         //info
-        m_isProcessing = false;
+        setIsProcessing(false);
         return;
     }
     m_forceQuitCurrentTool = false;
@@ -219,7 +253,7 @@ void MainWindow::processThread(taskType task)
     }
     emit addDataToLogListView("current image tool exit.\n");
     //std::cout << "processing ok." << std::endl;
-    m_isProcessing = false;
+    setIsProcessing(false);
 }
 
 void MainWindow::on_pushButton_forceQuit_clicked()
@@ -346,6 +380,7 @@ void MainWindow::on_pushButton_imagesCutter_start_clicked()
     m_imagesCutter->expect_w = ui->lineEdit_imagesCutter_w->text().toStdString();
     m_imagesCutter->expect_h = ui->lineEdit_imagesCutter_h->text().toStdString();
     m_imagesCutter->use_w_h_as_target_size = ui->checkBox_imagesCutter_asTargetSize->isChecked();
+    m_imagesCutter->mode = ui->comboBox_imageCuter_mode->currentIndex();
     std::thread t(&MainWindow::processThread,this,taskType_imagesCutter);
     t.detach();
 }
@@ -483,12 +518,6 @@ void MainWindow::on_pushButton_videoAudio_selectAudio_clicked()
 
 void MainWindow::on_pushButton_videoAudio_start_clicked()
 {
-    if(m_isProcessing)
-    {
-        onAddDataToLogListView("system is processing now, please try again a later.");
-        return;
-    }
-
     if(m_videoAudio != nullptr)
         delete m_videoAudio;
 
@@ -548,3 +577,32 @@ void MainWindow::on_comboBox_videoAudio_operateType_currentIndexChanged(int inde
 {
     ui->stackedWidget_videoAudioTools->setCurrentIndex(index);
 }
+
+void MainWindow::on_pushButton_images2video_select_clicked()
+{
+    QString imagesDir = QFileDialog::getExistingDirectory(this,tr("选择图片路径"),"/home",QFileDialog::ReadOnly);
+    if(imagesDir.isEmpty())
+        return;
+    ui->lineEdit_images2video_imagePath->setText(imagesDir);
+}
+
+void MainWindow::on_pushButton_images2video_start_clicked()
+{
+    if(ui->lineEdit_images2video_imagePath->text().isEmpty())
+    {
+        addDataToLogListView(tr("输入错误: 图片路径为空"));
+        return;
+    }
+    m_images2video->img_dir = ui->lineEdit_images2video_imagePath->text().toStdString();
+    m_images2video->start_seq = ui->lineEdit_images2video_startSeq->text().toStdString();
+    m_images2video->end_seq = ui->lineEdit_images2video_endSeq->text().toStdString();
+    m_images2video->img_suffix = ui->comboBox_images2video_imageType->currentText().toStdString();
+    m_images2video->output_hz = ui->lineEdit_images2video_outputHZ->text().toStdString();
+    m_images2video->image_interval = ui->comboBox_images2video_interval->currentText().toStdString();
+    m_images2video->scale = ui->lineEdit_images2video_scale->text().toStdString();
+
+    std::thread t(&MainWindow::processThread,this,taskType_images2video);
+    t.detach();
+}
+
+

@@ -63,11 +63,17 @@ private slots:
 
     void on_comboBox_videoAudio_operateType_currentIndexChanged(int index);
 
+    void on_pushButton_images2video_start_clicked();
+
+    void on_pushButton_images2video_select_clicked();
+
 signals:
     void addDataToLogListView(const QString& data);
 
 private:
     void closeEvent(QCloseEvent *event) override;
+    void setIsProcessing(bool flag);
+    void setOtherTabEnabled(QTabWidget* tabWidget, bool flag);
 
 private:
     Ui::MainWindow *ui;
@@ -79,6 +85,7 @@ private:
     Video2gif      *m_video2gif;
     Video2images   *m_video2images;
     Images2gif     *m_images2gif;
+    Images2video   *m_images2video;
     ImagesCutter   *m_imagesCutter;
     VideoCutter    *m_videoCutter;
     ImagesAddLogo  *m_imagesAddLogo;

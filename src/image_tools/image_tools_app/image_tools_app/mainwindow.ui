@@ -55,7 +55,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="page_imageTools">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -77,7 +77,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_imageTools">
             <property name="currentIndex">
-             <number>4</number>
+             <number>1</number>
             </property>
             <property name="usesScrollButtons">
              <bool>true</bool>
@@ -248,7 +248,7 @@
                   <item>
                    <widget class="QLineEdit" name="lineEdit_images2gif_endSeq">
                     <property name="text">
-                     <string>100</string>
+                     <string>200</string>
                     </property>
                    </widget>
                   </item>
@@ -281,11 +281,204 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>图片转视频</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_34">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_29">
+                <item>
+                 <widget class="QLabel" name="label_31">
+                  <property name="text">
+                   <string>图片路径</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_images2video_imagePath"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_images2video_select">
+                  <property name="text">
+                   <string>选择路径</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_30">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_28">
+                  <item>
+                   <widget class="QLabel" name="label_32">
+                    <property name="text">
+                     <string>图片类型</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_33">
+                    <property name="text">
+                     <string>输出帧率</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_29">
+                  <item>
+                   <widget class="QComboBox" name="comboBox_images2video_imageType">
+                    <item>
+                     <property name="text">
+                      <string>jpg</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>png</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_images2video_outputHZ">
+                    <property name="text">
+                     <string>20</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_30">
+                  <item>
+                   <widget class="QLabel" name="label_34">
+                    <property name="text">
+                     <string>起始编号</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_35">
+                    <property name="text">
+                     <string>图片间隔</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_31">
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_images2video_startSeq">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_images2video_interval">
+                    <property name="editable">
+                     <bool>true</bool>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>3</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>4</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>5</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_32">
+                  <item>
+                   <widget class="QLabel" name="label_36">
+                    <property name="text">
+                     <string>终止编号</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_37">
+                    <property name="text">
+                     <string>画面缩放</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_33">
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_images2video_endSeq">
+                    <property name="text">
+                     <string>200</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_images2video_scale">
+                    <property name="text">
+                     <string>1.0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_images2video_start">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>60</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>开始转换</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
             <widget class="QWidget" name="tab_imageCutter">
              <attribute name="title">
               <string>图像裁剪</string>
              </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <layout class="QVBoxLayout" name="verticalLayout_27">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
@@ -308,95 +501,147 @@
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <layout class="QHBoxLayout" name="horizontalLayout_28">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <layout class="QVBoxLayout" name="verticalLayout_2">
                   <item>
-                   <widget class="QLabel" name="label_16">
-                    <property name="text">
-                     <string>图片类型</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="comboBox_imagesCutter_imageType">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
                     <item>
-                     <property name="text">
-                      <string>jpg</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>png</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,1,1,5">
-                  <item>
-                   <widget class="QLabel" name="label_17">
-                    <property name="text">
-                     <string>锁定宽高比</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
-                    <item>
-                     <widget class="QLineEdit" name="lineEdit_imagesCutter_w">
+                     <widget class="QLabel" name="label_16">
                       <property name="text">
-                       <string>-1</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                       <string>图片类型</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="label_18">
+                     <widget class="QComboBox" name="comboBox_imagesCutter_imageType">
+                      <item>
+                       <property name="text">
+                        <string>jpg</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>png</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_30">
                       <property name="text">
-                       <string>X</string>
+                       <string>   裁剪模式</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLineEdit" name="lineEdit_imagesCutter_h">
-                      <property name="text">
-                       <string>-1</string>
-                      </property>
+                     <widget class="QComboBox" name="comboBox_imageCuter_mode">
+                      <item>
+                       <property name="text">
+                        <string>批量裁剪</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>逐张裁剪</string>
+                       </property>
+                      </item>
                      </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_7">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
                     </item>
                    </layout>
                   </item>
                   <item>
-                   <widget class="QCheckBox" name="checkBox_imagesCutter_asTargetSize">
-                    <property name="text">
-                     <string>是否作为目标尺寸</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,1,1,5">
+                      <item>
+                       <widget class="QLabel" name="label_17">
+                        <property name="text">
+                         <string>锁定宽高比</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_4">
+                        <item>
+                         <widget class="QLineEdit" name="lineEdit_imagesCutter_w">
+                          <property name="text">
+                           <string>-1</string>
+                          </property>
+                          <property name="alignment">
+                           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_18">
+                          <property name="text">
+                           <string>X</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="lineEdit_imagesCutter_h">
+                          <property name="text">
+                           <string>-1</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox_imagesCutter_asTargetSize">
+                        <property name="text">
+                         <string>是否作为目标尺寸</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_imagesCutter_start">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>65</height>
+                   </size>
+                  </property>
                   <property name="text">
-                   <string>开始运行</string>
+                   <string>开始
+运行</string>
                   </property>
                   <property name="checkable">
                    <bool>false</bool>
@@ -694,7 +939,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_videoTools">
             <property name="currentIndex">
-             <number>3</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="tab_video2gif">
              <attribute name="title">

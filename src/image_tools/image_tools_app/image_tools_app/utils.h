@@ -20,18 +20,23 @@ const QString g_toolDescription_images2gif =
                 "图片间隔: 图片的采样间隔"
                 "图片缩放: 图片缩放比例");
 
+const QString g_toolDescription_images2video =
+        QString("d");
+
 const QString g_toolDescription_video2images =
         QString("将视频拆分为图片并保存在独立文件夹\n"
                 "支持MP4 / AVI / GIF");
 
 const QString g_toolDescription_imagesCutter =
-        QString("批量裁剪目标文件夹下所有指定后缀的图片,裁剪后的图片保存在独立文件夹，不删除原文件\n"
-                "点击运行后,将显示一张目标图片,使用鼠标左键框选裁剪区域,\n"
-                "完成后点击鼠标中键或键盘's'键开始裁剪\n"
-                "按'q'键放弃裁剪\n\n"
-                "图片类型  : 图片后缀名\n"
-                "锁定宽高比 : 裁剪时是否锁定宽高比\n"
-                "复选框    : 是否使用输入的宽高作为目标尺寸");
+        QString("裁剪目标文件夹下所有指定后缀的图片,裁剪后的图片保存在独立文件夹，不删除原文件\n"
+                "点击运行后,将显示一张目标图片, 可使用 < , > 切换图片\n"
+                "使用鼠标左键框选裁剪区域,按键盘's'键开始裁剪\n"
+                "按'q'键放弃裁剪并退出\n\n"
+                "图片类型    : 图片后缀名\n"
+                "锁定宽高比   : 裁剪时是否锁定宽高比\n"
+                "是否目标尺寸 : 是否使用输入的宽高作为目标尺寸\n"
+                "批量裁剪    :所有图片使用相同的裁剪区域\n"
+                "逐张裁剪    :每张图片使用不同的裁剪区域");
 
 const QString g_toolDescription_videoCutter =
         QString("可视化视频裁剪工具,裁剪后的视频与原视频位于相同路径\n"
@@ -64,6 +69,7 @@ const QString g_toolDescription_imagesRename =
 enum taskType
 {
     taskType_images2gif,
+    taskType_images2video,
     taskType_imagesCutter,
     taskType_imagesAddLogo,
     taskType_imagesRename,
@@ -88,6 +94,7 @@ enum stackWidget
 enum imageToolsWidget_Tab
 {
     imageToolsWidget_Tab_images2gif,
+    imageToolsWidget_Tab_images2video,
     imageToolsWidget_Tab_imagesCutter,
     imageToolsWidget_Tab_imagesAddLogo,
     imageToolsWidget_Tab_imagesRename,
@@ -96,6 +103,7 @@ enum imageToolsWidget_Tab
 //图片工具描述，顺序应与imageToolsWidget_Tab对应
 static std::vector<QString> g_imageToolsDiscription = {
     g_toolDescription_images2gif,
+    g_toolDescription_images2video,
     g_toolDescription_imagesCutter,
     g_toolDescription_imagesAddLogo,
     g_toolDescription_imagesRename
@@ -177,6 +185,37 @@ public:
     }
 };
 
+class Images2video
+{
+public:
+    Images2video(const std::string& scriptsDir)
+    {
+        tool_script = scriptsDir + "/images2video.py";
+    }
+    std::string tool_script;
+    std::string img_dir;
+    std::string start_seq;
+    std::string end_seq;
+    std::string img_suffix;
+    std::string output_hz;
+    std::string image_interval; //optional
+    std::string scale; //optional
+
+    std::string cmd()
+    {
+        image_interval = std::to_string(atoi(image_interval.c_str()) + 1);
+
+        std::string _cmd = std::string("python ")+tool_script+" "+img_dir+" "
+                                                 +start_seq + " "
+                                                 +end_seq + " "
+                                                 +img_suffix + " "
+                                                 +output_hz + " "
+                                                 +image_interval+ " "
+                                                 +scale;
+        return _cmd;
+    }
+};
+
 class Video2images
 {
 public:
@@ -219,6 +258,7 @@ public:
     {
         tool_script = scriptsDir + "/images_cutter.py";
     }
+    int mode;
     std::string tool_script;
     std::string images_dir;
     std::string image_suffix;
@@ -229,7 +269,7 @@ public:
     std::string cmd()
     {
         std::string _cmd = std::string("python ")+tool_script+" "+images_dir + " "
-                                                 +image_suffix + " ";
+                                                 +image_suffix + " " + std::to_string(mode) + " ";
         if(expect_w != "-1" && expect_h != "-1")
         {
             _cmd += expect_w + ":" + expect_h + " ";

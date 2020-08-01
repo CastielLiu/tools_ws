@@ -94,7 +94,7 @@ class ImagesCutter:
 		self.inited = True
 		return True
 		
-	def cut(self):
+	def batchCut(self):
 		if(self.inited == False):
 			print("please initial before cut")
 			return
@@ -102,14 +102,19 @@ class ImagesCutter:
 		cv2.namedWindow(self.windowName,0)
 		cv2.setMouseCallback(self.windowName, self.onMouse)
 		
-		raw_img = cv2.imread(self.img_names[0])
-		print("size: ", raw_img.shape)
+		image_index = 0
+		last_image_index = -1
+		raw_img = None
 		while(not self.select_ok):
+			if(image_index != last_image_index):
+				raw_img = cv2.imread(self.img_names[image_index])
+				last_image_index = image_index
+			
 			out_img = raw_img.copy() #拷贝一份，防止污染源图
 			self.img_size = (out_img.shape[1],out_img.shape[0])
 			if(self.cut_vertex1 and self.cut_vertex2): #两顶点同时具备时开始绘制
 				point_color = (0, 255, 0) # BGR
-				thickness = 2
+				thickness = int(max(self.img_size)/600.0 + 0.5)
 				lineType = 3
 				cv2.rectangle(out_img, tuple(self.cut_vertex1), tuple(self.cut_vertex2), point_color, thickness, lineType)
 					
@@ -121,6 +126,11 @@ class ImagesCutter:
 				return
 			elif(ord('s') == key):
 				self.select_ok = True
+			elif(ord(',') == key):
+				image_index = (image_index+1 + len(self.img_names))%len(self.img_names)
+			elif(ord('.') == key):
+				image_index = (image_index-1 + len(self.img_names))%len(self.img_names)
+			
 		cnt = 1
 		rowBegin = min(self.cut_vertex1[1], self.cut_vertex2[1])
 		rowEnd   = max(self.cut_vertex1[1], self.cut_vertex2[1])
@@ -147,16 +157,87 @@ class ImagesCutter:
 			cnt = cnt + 1
 		print("cutted images saved in %s" %self.out_dir)
 		sys.stdout.flush() #强制刷新输出缓冲区
+	
+	
+	def oneByoneCut(self):
+		if(self.inited == False):
+			print("please initial before oneByoneCut")
+			return
+			
+		cv2.namedWindow(self.windowName,0)
+		cv2.setMouseCallback(self.windowName, self.onMouse)
+		
+		image_index = 0
+		last_image_index = -1
+		raw_img = None
+		imgs_handled_flag = [0] * len(self.img_names)
+		unHandledImgSize = len(self.img_names)
+		
+		while(unHandledImgSize):
+		
+			#查找还未处理的图片索引
+			while(imgs_handled_flag[image_index]):
+				image_index = (image_index+1+len(self.img_names))%len(self.img_names)
+		
+			if(image_index != last_image_index):
+				raw_img = cv2.imread(self.img_names[image_index])
+				last_image_index = image_index
+			
+			out_img = raw_img.copy() #拷贝一份，防止污染源图
+			
+			self.img_size = (out_img.shape[1],out_img.shape[0])
+			if(self.cut_vertex1 and self.cut_vertex2): #两顶点同时具备时开始绘制
+				point_color = (0, 255, 0) # BGR
+				thickness = int(max(self.img_size)/600.0 + 0.5)
+				lineType = 3
+				cv2.rectangle(out_img, tuple(self.cut_vertex1), tuple(self.cut_vertex2), point_color, thickness, lineType)
+					
+			cv2.imshow(self.windowName, out_img)
+				
+			key = cv2.waitKey(30)
+			if(ord('q') == key):
+				cv2.destroyAllWindows()
+				return
+			elif(ord(',') == key):
+				image_index = (image_index+1 + len(self.img_names))%len(self.img_names)
+			elif(ord('.') == key):
+				image_index = (image_index-1 + len(self.img_names))%len(self.img_names)
+			elif(ord('s') == key):
+				imgs_handled_flag[image_index] = 1
+				unHandledImgSize = unHandledImgSize - 1
+			
+				rowBegin = min(self.cut_vertex1[1], self.cut_vertex2[1])
+				rowEnd   = max(self.cut_vertex1[1], self.cut_vertex2[1])
+				colBegin = min(self.cut_vertex1[0], self.cut_vertex2[0])
+				colEnd   = max(self.cut_vertex1[0], self.cut_vertex2[0])
+			
+				out_img = raw_img[rowBegin:rowEnd,colBegin:colEnd]
+				if(self.use_ratio_scale):
+					out_img =cv2.resize(out_img,(self.cut_ratio[0],self.cut_ratio[1]),0,0, interpolation=cv2.INTER_NEAREST)
+		
+				#解算文件名
+				temp = self.img_names[image_index].split('/')
+				imgRelName = temp[len(temp)-1]
+		
+				out_name = self.out_dir + "/" + imgRelName
+				cv2.imwrite(out_name,out_img)
+				print("%s saved." %(out_name))
+				sys.stdout.flush() #强制刷新输出缓冲区
 			
 def main(argv):
-	if(len(argv) < 3):
-		print("please input images [path],[suffix],(w:h), (asTargetScale)")
+	if(len(argv) < 4):
+		print("please input images [path],[suffix],(mode),(w:h), (asTargetScale)")
 		exit()
 	path = argv[1]
 	suffix = argv[2]
+	mode = 0
 	ratio = None
 	asTargetScale = False
+	
 	if(len(argv) > 3):
+		mode = int(argv[3])
+		
+	if(len(argv) > 4):
 		temp = argv[3].split(':')
 		w = int(temp[0])
 		h = int(temp[1])
@@ -164,17 +245,19 @@ def main(argv):
 			ratio = (w,h)             #裁剪宽高比
 		else:
 			print("The parameter (w:h) is invalid! ")
-	if(len(argv) > 4):
-		asTargetScale = bool(argv[4]) #使用传入的宽高比数值作为目标尺寸
+	if(len(argv) > 5):
+		asTargetScale = bool(argv[5]) #使用传入的宽高比数值作为目标尺寸
 
 	app = ImagesCutter()
 	ok = app.init(path,suffix,ratio,asTargetScale)
 	if(not ok):
 		return
-	app.cut()
+	if(mode == 0):
+		app.batchCut()
+	else:
+		app.oneByoneCut()
 	print("over")
 	cv2.destroyAllWindows()
-
 
 
 if __name__ == "__main__":
