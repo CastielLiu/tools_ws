@@ -259,6 +259,7 @@ def main(argv):
 	print("over")
 	cv2.destroyAllWindows()
 
+#问题记录：切换到下一张图片时,应先检查图片尺寸再绘制方框，防止图片尺寸变化导致的边框无法绘制
 
 if __name__ == "__main__":
 	main(sys.argv)
