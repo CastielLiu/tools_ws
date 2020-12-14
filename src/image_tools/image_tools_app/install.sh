@@ -2,7 +2,7 @@
 
 pwd=`pwd`
 exe=${pwd}/release/imageTools
-icon=${pwd}/image_tools_app/resouces/icon.jpg
+icon=${pwd}/image_tools_app/resouces/app.ico
 newline="\n"
 
 output="image_tools_app.desktop"
@@ -27,5 +27,6 @@ if [ -f "~/Desktop/$output" ]; then
 fi
 
 cp "$pwd/$output" ~/Desktop/$output
+chmod a+x $exe
 
 echo "generate desktop shortcut ok."

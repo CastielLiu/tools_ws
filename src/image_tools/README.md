@@ -1,4 +1,5 @@
 #　图片处理工具
+** 运行./install.sh 安装工具所依赖的python模块
 
 ##　tools
 

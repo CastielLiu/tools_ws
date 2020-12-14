@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Exec=/home/wendao/projects/tools_ws/src/image_tools/image_tools_app/release/imageTools
+Exec=/home/ubuntu/projects/tools_ws/src/image_tools/image_tools_app/release/imageTools
 Name=image_tools
 GenericName=IMAGE_TOOLS
-Icon=/home/wendao/projects/tools_ws/src/image_tools/image_tools_app/image_tools_app/resouces/icon.jpg
+Icon=/home/ubuntu/projects/tools_ws/src/image_tools/image_tools_app/image_tools_app/resouces/app.ico
 Terminal=false
 Categories=Development

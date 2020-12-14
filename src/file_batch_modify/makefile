@@ -1,5 +1,5 @@
 main: file_batch_processing.cpp
-	g++ file_batch_processing.cpp -std=c++11 -lboost_system -lboost_filesystem -o main
+	g++ file_batch_processing.cpp -std=c++11 -lboost_system -lboost_filesystem -o exe
 
 clean:
-	rm main
+	rm exe

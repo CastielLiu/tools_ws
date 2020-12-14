@@ -38,7 +38,7 @@ def handle(video,resolution,totalTime):
 
 	print("saving %s ..." %outName)
 	sys.stdout.flush() #强制刷新输出缓冲区
-	gif=imageio.mimsave(outName,imageBuf,'GIF',duration=duration)
+	gif = imageio.mimsave(outName,imageBuf,'GIF',duration=duration)
 
 	print("%s contains %d frame images, total time is %.2fs" %(outName,imgCnt,duration*imgCnt))
 	print("%s saved." %outName)
